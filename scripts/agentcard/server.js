@@ -12,13 +12,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
 const defaultStaticDir = path.join(rootDir, "dist");
 
-export function createIslandHttpServer({
+export function createAgentCardHttpServer({
   project = path.basename(process.cwd()),
   staticDir = defaultStaticDir,
   permissionStore = createPermissionStore(),
   questionStore = createQuestionStore()
 } = {}) {
-  const store = createIslandStateStore({ project });
+  const store = createAgentCardStateStore({ project });
   const broadcaster = createSnapshotBroadcaster();
 
   const server = http.createServer(async (request, response) => {
@@ -240,7 +240,7 @@ function questionDecisionAction(result) {
   return `副屏已选择：${result.answer}`;
 }
 
-export function createIslandStateStore({ project }) {
+export function createAgentCardStateStore({ project }) {
   let snapshot = createIdleSnapshot({ project });
   let diagnosticEvents = [];
 
@@ -289,8 +289,8 @@ function redactDiagnosticEntry(entry) {
   );
 }
 
-export async function startIslandServer({ port }) {
-  const server = createIslandHttpServer();
+export async function startAgentCardServer({ port }) {
+  const server = createAgentCardHttpServer();
 
   await new Promise((resolve) => {
     server.listen(port, "0.0.0.0", resolve);

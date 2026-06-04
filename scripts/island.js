@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-import { parseCliArgs, usage } from "./island/cliArgs.js";
-import { launchClaude } from "./island/claude.js";
-import { runWrappedCommand } from "./island/run.js";
-import { installClaudeHooks } from "./island/setupClaudeHooks.js";
-import { startIslandServer } from "./island/server.js";
+import { parseCliArgs, usage } from "./agentcard/cliArgs.js";
+import { launchClaude } from "./agentcard/claude.js";
+import { runWrappedCommand } from "./agentcard/run.js";
+import { installClaudeHooks } from "./agentcard/setupClaudeHooks.js";
+import { startAgentCardServer } from "./agentcard/server.js";
 
 async function main() {
   const parsed = parseCliArgs(process.argv.slice(2));
 
   if (parsed.mode === "server") {
-    await startIslandServer({ port: parsed.port });
+    await startAgentCardServer({ port: parsed.port });
     return;
   }
 

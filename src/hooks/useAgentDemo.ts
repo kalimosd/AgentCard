@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
-import { DEMO_STEP_MS, islandScenarios } from "../data/islandScenarios";
-import { nextScenarioIndex } from "../lib/islandDemo";
+import { DEMO_STEP_MS, agentScenarios } from "../data/agentScenarios";
+import { nextScenarioIndex } from "../lib/agentDemo";
 import {
   skipQuestion,
   submitPermissionDecision,
   submitQuestionAnswer,
   submitQuestionAnswers
-} from "../lib/islandApi";
+} from "../lib/agentApi";
 import type { InterventionCard, QuestionAnswer } from "../types";
-import { useIslandLive } from "./useIslandLive";
+import { useAgentLive } from "./useAgentLive";
 
-export function useIslandDemo() {
-  const live = useIslandLive();
+export function useAgentDemo() {
+  const live = useAgentLive();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [dismissedIntervention, setDismissedIntervention] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
-  const demoSnapshot = islandScenarios[index] ?? islandScenarios[0];
+  const demoSnapshot = agentScenarios[index] ?? agentScenarios[0];
   const snapshot = live.snapshot ?? demoSnapshot;
   const liveMode = Boolean(live.snapshot);
   const liveResetKey = liveMode
@@ -45,13 +45,13 @@ export function useIslandDemo() {
     if (liveMode) return;
     if (paused) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => nextScenarioIndex(current, islandScenarios.length));
+      setIndex((current) => nextScenarioIndex(current, agentScenarios.length));
     }, DEMO_STEP_MS);
     return () => window.clearInterval(timer);
   }, [liveMode, paused]);
 
   const advance = useCallback(() => {
-    setIndex((current) => nextScenarioIndex(current, islandScenarios.length));
+    setIndex((current) => nextScenarioIndex(current, agentScenarios.length));
   }, []);
 
   const dismissIntervention = useCallback(() => {
@@ -69,7 +69,7 @@ export function useIslandDemo() {
             ? "已在副屏允许，Claude 会继续执行。"
             : decision === "always"
               ? "本会话已总是允许该权限，Claude 会继续执行。"
-            : "已在副屏拒绝该权限请求。"
+              : "已在副屏拒绝该权限请求。"
         );
       } catch {
         setActionFeedback("无法连接 AgentCard server，请确认服务是否在运行。");
@@ -132,7 +132,7 @@ export function useIslandDemo() {
   return {
     snapshot,
     index,
-    total: islandScenarios.length,
+    total: agentScenarios.length,
     paused,
     now,
     dismissedIntervention,

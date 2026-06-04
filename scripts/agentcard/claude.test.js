@@ -72,7 +72,7 @@ describe("claude launcher", () => {
     expect(readServerPort("http://127.0.0.1:4999")).toBe(4999);
   });
 
-  it("does not treat a non-island health response as reachable", async () => {
+  it("does not treat a non-AgentCard health response as reachable", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ app: "vite" })

@@ -1,4 +1,4 @@
-import type { IslandSnapshot } from "../types";
+import type { AgentSnapshot } from "../types";
 
 const baseUsage = {
   sessionTokensEstimated: true,
@@ -11,7 +11,7 @@ const baseUsage = {
 
 const started = (offsetMs: number) => Date.now() - offsetMs;
 
-export const islandScenarios: IslandSnapshot[] = [
+export const agentScenarios: AgentSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
@@ -76,7 +76,7 @@ export const islandScenarios: IslandSnapshot[] = [
     currentTool: { kind: "read", label: "src/types.ts" },
     eventTail: [
       { time: "23:40:35", text: "Read: src/types.ts" },
-      { time: "23:40:41", text: "Read: src/data/islandScenarios.ts" },
+      { time: "23:40:41", text: "Read: src/data/agentScenarios.ts" },
       { time: "23:40:48", text: "Read: src/App.tsx" }
     ],
     model: "gpt-5-codex",
@@ -95,7 +95,7 @@ export const islandScenarios: IslandSnapshot[] = [
     currentTool: { kind: "edit", label: "src/App.tsx" },
     eventTail: [
       { time: "23:41:02", text: "Edit: src/types.ts" },
-      { time: "23:41:15", text: "Edit: src/data/islandScenarios.ts" },
+      { time: "23:41:15", text: "Edit: src/data/agentScenarios.ts" },
       { time: "23:41:28", text: "Edit: src/App.tsx" }
     ],
     model: "gpt-5-codex",
@@ -115,7 +115,7 @@ export const islandScenarios: IslandSnapshot[] = [
     eventTail: [
       { time: "23:41:40", text: "Edit complete" },
       { time: "23:41:52", text: "Bash: npm test" },
-      { time: "23:41:53", text: "vitest: running islandDemo.test.ts" }
+      { time: "23:41:53", text: "vitest: running agentDemo.test.ts" }
     ],
     model: "gpt-5-codex",
     sessionStartedAt: started(142000),
@@ -183,7 +183,7 @@ export const islandScenarios: IslandSnapshot[] = [
     currentTool: { kind: "bash", label: "npm test" },
     eventTail: [
       { time: "23:42:40", text: "Bash: npm test (exit 1)" },
-      { time: "23:42:41", text: "FAIL islandDemo.test.ts > scenario shape" },
+      { time: "23:42:41", text: "FAIL agentDemo.test.ts > scenario shape" },
       { time: "23:42:41", text: "Expected command_failed scenario" }
     ],
     model: "gpt-5-codex",
@@ -200,7 +200,7 @@ export const islandScenarios: IslandSnapshot[] = [
       title: "测试失败",
       detail: "1 failed · 12 passed · 221ms",
       payload:
-        "FAIL  src/lib/islandDemo.test.ts > islandDemo > covers all MVP intervention card scenarios\nAssertionError: expected scenario coverage"
+        "FAIL  src/lib/agentDemo.test.ts > agentDemo > covers all MVP intervention card scenarios\nAssertionError: expected scenario coverage"
     }
   },
   {

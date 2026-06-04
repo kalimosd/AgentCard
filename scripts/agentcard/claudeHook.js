@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import { pathToFileURL } from "node:url";
-import { mapClaudeHookToIslandEvent } from "./claudeHookEvent.js";
+import { mapClaudeHookToAgentCardEvent } from "./claudeHookEvent.js";
 
 const serverUrl =
   process.env.AGENTCARD_SERVER_URL ??
-  process.env.ISLAND_SERVER_URL ??
   "http://127.0.0.1:4317";
 
 async function main() {
@@ -30,7 +29,6 @@ export async function routeClaudeHookPayload(
     postJson: post = postJson,
     preToolPermissionMode =
       process.env.AGENTCARD_PRETOOL_PERMISSION_MODE ??
-      process.env.ISLAND_PRETOOL_PERMISSION_MODE ??
       "observe"
   } = {}
 ) {
@@ -44,7 +42,7 @@ export async function routeClaudeHookPayload(
     if (preToolPermissionMode === "gate") {
       return handlePermissionRequest(payload, { postJson: post });
     }
-    const event = mapClaudeHookToIslandEvent(payload);
+    const event = mapClaudeHookToAgentCardEvent(payload);
     if (event) {
       await post("/events", event);
     }
@@ -61,7 +59,7 @@ export async function routeClaudeHookPayload(
     return handlePermissionRequest(payload, { postJson: post });
   }
 
-  const event = mapClaudeHookToIslandEvent(payload);
+  const event = mapClaudeHookToAgentCardEvent(payload);
   if (!event) return null;
   if (isAnswerableQuestionEvent(event)) {
     return handleQuestionRequest(payload, { postJson: post });
@@ -71,7 +69,7 @@ export async function routeClaudeHookPayload(
 }
 
 async function postObservedEvent(payload, post) {
-  const event = mapClaudeHookToIslandEvent(payload);
+  const event = mapClaudeHookToAgentCardEvent(payload);
   if (event) {
     await post("/events", event);
   }
@@ -85,7 +83,7 @@ async function handlePermissionRequest(
   const event =
     payload.hook_event_name === "PreToolUse"
       ? mapPreToolUseToPermissionEvent(payload)
-      : mapClaudeHookToIslandEvent(payload);
+      : mapClaudeHookToAgentCardEvent(payload);
   if (!event) return;
 
   try {
@@ -101,7 +99,7 @@ async function handlePermissionRequest(
 }
 
 async function handleQuestionRequest(payload, { postJson: post = postJson } = {}) {
-  const event = mapClaudeHookToIslandEvent(payload);
+  const event = mapClaudeHookToAgentCardEvent(payload);
   if (!event) return null;
   if (!isAnswerableQuestionEvent(event)) {
     await post("/events", event);
@@ -124,7 +122,7 @@ async function handlePlanChoiceRequest(
   payload,
   { postJson: post = postJson } = {}
 ) {
-  const event = mapClaudeHookToIslandEvent(payload);
+  const event = mapClaudeHookToAgentCardEvent(payload);
   if (!event) return null;
 
   try {
@@ -396,7 +394,7 @@ function isAnswerableQuestionEvent(event) {
 }
 
 function mapPreToolUseToPermissionEvent(payload) {
-  const event = mapClaudeHookToIslandEvent(payload);
+  const event = mapClaudeHookToAgentCardEvent(payload);
   if (!event) return null;
 
   return {

@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
-import type { IslandSnapshot } from "../types";
+import type { AgentSnapshot } from "../types";
 import {
-  isIslandSnapshot,
-  resolveIslandHttpUrl,
-  resolveIslandWsUrl
-} from "../lib/liveIsland";
+  isAgentSnapshot,
+  resolveAgentCardHttpUrl,
+  resolveAgentCardWsUrl
+} from "../lib/liveAgent";
 
 export type LiveConnectionState = "connecting" | "connected" | "offline";
 
-export function useIslandLive() {
-  const [snapshot, setSnapshot] = useState<IslandSnapshot | null>(null);
+export function useAgentLive() {
+  const [snapshot, setSnapshot] = useState<AgentSnapshot | null>(null);
   const [connectionState, setConnectionState] =
     useState<LiveConnectionState>("connecting");
 
   const applySnapshot = useCallback((value: unknown) => {
-    if (isIslandSnapshot(value)) {
+    if (isAgentSnapshot(value)) {
       setSnapshot(value);
       setConnectionState("connected");
     }
@@ -23,7 +23,7 @@ export function useIslandLive() {
   const pullSnapshot = useCallback(async () => {
     try {
       const response = await fetch(
-        `${resolveIslandHttpUrl(window.location.href)}/snapshot`
+        `${resolveAgentCardHttpUrl(window.location.href)}/snapshot`
       );
       if (!response.ok) return false;
       applySnapshot(await response.json());
@@ -39,7 +39,7 @@ export function useIslandLive() {
     const wsUrl =
       import.meta.env.VITE_AGENTCARD_WS_URL ??
       import.meta.env.VITE_ISLAND_WS_URL ??
-      resolveIslandWsUrl(window.location.href);
+      resolveAgentCardWsUrl(window.location.href);
     const socket = new WebSocket(wsUrl);
 
     socket.addEventListener("open", () => {

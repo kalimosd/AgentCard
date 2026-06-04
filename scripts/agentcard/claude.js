@@ -1,6 +1,6 @@
 import { runWrappedCommand } from "./run.js";
 import { installClaudeHooks } from "./setupClaudeHooks.js";
-import { startIslandServer } from "./server.js";
+import { startAgentCardServer } from "./server.js";
 
 const DEFAULT_SERVER_URL = "http://127.0.0.1:4317";
 
@@ -8,7 +8,7 @@ export async function launchClaude({
   command = ["claude"],
   serverUrl = DEFAULT_SERVER_URL,
   fetchImpl = fetch,
-  startServer = startIslandServer,
+  startServer = startAgentCardServer,
   installHooks = installClaudeHooks,
   runCommand = runWrappedCommand,
   logger = console

@@ -121,7 +121,7 @@ describe("routeClaudeHookPayload", () => {
     });
   });
 
-  it("falls back to Claude native AskUserQuestion PreToolUse when the island question is skipped", async () => {
+  it("falls back to Claude native AskUserQuestion PreToolUse when the AgentCard question is skipped", async () => {
     const output = await routeClaudeHookPayload(
       {
         hook_event_name: "PreToolUse",
@@ -384,7 +384,7 @@ describe("routeClaudeHookPayload", () => {
     });
   });
 
-  it("dedupes duplicate multi-question answer keys like CodeIsland", () => {
+  it("dedupes duplicate multi-question answer keys", () => {
     const output = buildQuestionAnswerOutput(
       {
         hook_event_name: "PermissionRequest",
@@ -411,7 +411,7 @@ describe("routeClaudeHookPayload", () => {
     });
   });
 
-  it("falls back to Claude native AskUserQuestion when the island question is skipped", async () => {
+  it("falls back to Claude native AskUserQuestion when the AgentCard question is skipped", async () => {
     const output = await routeClaudeHookPayload(
       {
         hook_event_name: "PermissionRequest",

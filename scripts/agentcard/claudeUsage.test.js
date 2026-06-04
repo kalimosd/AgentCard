@@ -6,7 +6,7 @@ import { estimateUsageFromTranscript } from "./claudeUsage.js";
 
 describe("claudeUsage", () => {
   it("sums assistant usage lines from a transcript", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "island-usage-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "agentcard-usage-"));
     const file = path.join(dir, "session.jsonl");
     fs.writeFileSync(
       file,

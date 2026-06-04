@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
-const hookScript = path.join(rootDir, "scripts/island/claudeHook.js");
+const hookScript = path.join(rootDir, "scripts/agentcard/claudeHook.js");
 const marker = "agentcard-claude-hook";
 
 export function buildClaudeHookEntries(serverUrl = "http://127.0.0.1:4317") {
@@ -13,13 +13,13 @@ export function buildClaudeHookEntries(serverUrl = "http://127.0.0.1:4317") {
     type: "command",
     command,
     timeout: 5,
-    _islandMarker: marker
+    _agentcardMarker: marker
   };
   const blockingEntry = {
     type: "command",
     command,
     timeout: 86400,
-    _islandMarker: marker
+    _agentcardMarker: marker
   };
 
   return {
@@ -40,10 +40,10 @@ export function mergeClaudeHooks(settings, serverUrl) {
 
   for (const [eventName, matchers] of Object.entries(incoming)) {
     const existingMatchers = [...(hooks[eventName] ?? [])].filter(
-      (matcher) => !isIslandMatcher(matcher)
+      (matcher) => !isAgentCardMatcher(matcher)
     );
-    const islandMatcher = matchers[0];
-    existingMatchers.push(stripMarker(islandMatcher));
+    const agentcardMatcher = matchers[0];
+    existingMatchers.push(stripMarker(agentcardMatcher));
 
     hooks[eventName] = existingMatchers;
   }
@@ -51,12 +51,13 @@ export function mergeClaudeHooks(settings, serverUrl) {
   return { ...settings, hooks };
 }
 
-function isIslandMatcher(matcher) {
+function isAgentCardMatcher(matcher) {
   return (matcher.hooks ?? []).some((hook) => {
     const command = String(hook.command ?? "");
     return (
       command.includes(marker) ||
       command.includes(hookScript) ||
+      command.includes("scripts/agentcard/claudeHook.js") ||
       command.includes("scripts/island/claudeHook.js")
     );
   });
@@ -91,6 +92,6 @@ export function installClaudeHooks({
 function stripMarker(matcher) {
   return {
     ...matcher,
-    hooks: matcher.hooks.map(({ _islandMarker, ...hook }) => hook)
+    hooks: matcher.hooks.map(({ _agentcardMarker, _islandMarker, ...hook }) => hook)
   };
 }

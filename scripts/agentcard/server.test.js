@@ -1,11 +1,11 @@
 import { Readable } from "node:stream";
 import { describe, expect, it } from "vitest";
 import { createStartingEvent } from "./eventModel.js";
-import { createIslandHttpServer, createIslandStateStore } from "./server.js";
+import { createAgentCardHttpServer, createAgentCardStateStore } from "./server.js";
 
 describe("AgentCard server", () => {
   it("updates the latest snapshot from wrapper events", () => {
-    const store = createIslandStateStore({ project: "AgentCard" });
+    const store = createAgentCardStateStore({ project: "AgentCard" });
 
     store.applyEvent(
       createStartingEvent({
@@ -26,7 +26,7 @@ describe("AgentCard server", () => {
   });
 
   it("clears typed interactions when the active intervention is cleared", () => {
-    const store = createIslandStateStore({ project: "AgentCard" });
+    const store = createAgentCardStateStore({ project: "AgentCard" });
 
     const permission = store.applyEvent({
       agent: "claude",
@@ -65,7 +65,7 @@ describe("AgentCard server", () => {
   });
 
   it("exposes capped diagnostic events for local debugging", async () => {
-    const server = createIslandHttpServer({ project: "AgentCard" });
+    const server = createAgentCardHttpServer({ project: "AgentCard" });
 
     await requestServer(server, {
       method: "POST",
@@ -99,7 +99,7 @@ describe("AgentCard server", () => {
   });
 
   it("creates answerable question interventions and resolves answers", async () => {
-    const server = createIslandHttpServer({ project: "AgentCard" });
+    const server = createAgentCardHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",
@@ -164,7 +164,7 @@ describe("AgentCard server", () => {
   });
 
   it("creates multi-question interventions and resolves grouped answers", async () => {
-    const server = createIslandHttpServer({ project: "AgentCard" });
+    const server = createAgentCardHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",
@@ -271,7 +271,7 @@ describe("AgentCard server", () => {
   });
 
   it("marks parsed terminal choice questions as answerable in the snapshot", async () => {
-    const server = createIslandHttpServer({ project: "AgentCard" });
+    const server = createAgentCardHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",

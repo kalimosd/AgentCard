@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "agentcard": "scripts/island.js",
-    "island": "scripts/island.js"
+    "agentcard": "scripts/island.js"
   },
   "scripts": {
     "dev": "vite --host",
@@ -13,9 +12,6 @@
     "agentcard": "node scripts/island.js",
     "agentcard:server": "node scripts/island.js server",
     "agentcard:setup-claude": "node scripts/island.js setup claude",
-    "island": "node scripts/island.js",
-    "island:server": "node scripts/island.js server",
-    "island:setup-claude": "node scripts/island.js setup claude",
     "preview": "vite preview --host",
     "test": "vitest run"
   },

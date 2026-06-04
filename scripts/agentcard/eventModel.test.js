@@ -12,7 +12,7 @@ import {
   isInteractiveAgentCommand
 } from "./eventModel.js";
 
-describe("island event model", () => {
+describe("AgentCard event model", () => {
   it("creates an idle snapshot before a wrapped command starts", () => {
     expect(createIdleSnapshot({ project: "AgentCard" })).toMatchObject({
       agent: "codex",
@@ -22,7 +22,7 @@ describe("island event model", () => {
     });
   });
 
-  it("maps wrapper lifecycle events to status island snapshots", () => {
+  it("maps wrapper lifecycle events to AgentCard snapshots", () => {
     const started = eventToSnapshot(
       createStartingEvent({
         command: ["claude", "--model", "sonnet"],
@@ -99,7 +99,7 @@ describe("island event model", () => {
   });
 
   it("merges usage from transcript path when available", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "island-event-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "agentcard-event-"));
     const file = path.join(dir, "session.jsonl");
     fs.writeFileSync(
       file,
@@ -140,8 +140,8 @@ describe("island event model", () => {
         message: "Read: App.tsx",
         toolKind: "read",
         toolLabel: "App.tsx",
-        taskPrompt: "Fix the island UI",
-        sessionTitle: "Fix the island UI"
+        taskPrompt: "Fix the AgentCard UI",
+        sessionTitle: "Fix the AgentCard UI"
       },
       undefined
     );
@@ -152,7 +152,7 @@ describe("island event model", () => {
       project: "my-app",
       state: "reading",
       currentTool: { kind: "read", label: "App.tsx" },
-      taskPrompt: "Fix the island UI"
+      taskPrompt: "Fix the AgentCard UI"
     });
   });
 

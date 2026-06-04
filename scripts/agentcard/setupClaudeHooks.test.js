@@ -35,7 +35,7 @@ describe("setupClaudeHooks", () => {
 
   it("collapses duplicate AgentCard hook entries from older setup runs", () => {
     const command =
-      'ISLAND_SERVER_URL=http://127.0.0.1:4317 node "/Users/me/AgentCard/scripts/island/claudeHook.js"';
+      'AGENTCARD_SERVER_URL=http://127.0.0.1:4317 node "/Users/me/AgentCard/scripts/agentcard/claudeHook.js"';
     const merged = mergeClaudeHooks(
       {
         hooks: {

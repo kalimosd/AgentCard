@@ -3,7 +3,7 @@ import path from "node:path";
 const TOOL_READ = new Set(["Read", "Glob", "Grep", "LS", "WebFetch", "WebSearch"]);
 const TOOL_EDIT = new Set(["Edit", "Write", "NotebookEdit"]);
 
-export function mapClaudeHookToIslandEvent(payload) {
+export function mapClaudeHookToAgentCardEvent(payload) {
   if (!payload || typeof payload !== "object") return null;
 
   const hookName = payload.hook_event_name;

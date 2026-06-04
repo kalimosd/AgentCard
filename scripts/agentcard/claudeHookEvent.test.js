@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  mapClaudeHookToIslandEvent,
+  mapClaudeHookToAgentCardEvent,
   stateForTool,
   toolLabel
 } from "./claudeHookEvent.js";
 
 describe("claudeHookEvent", () => {
   it("maps bash pre-tool use to running_command", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PreToolUse",
       cwd: "/Users/me/my-app",
       tool_name: "Bash",
@@ -24,13 +24,13 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps read and edit tools to file states", () => {
-    const read = mapClaudeHookToIslandEvent({
+    const read = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PreToolUse",
       cwd: "/Users/me/my-app",
       tool_name: "Read",
       tool_input: { file_path: "/Users/me/my-app/src/App.tsx" }
     });
-    const edit = mapClaudeHookToIslandEvent({
+    const edit = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PreToolUse",
       cwd: "/Users/me/my-app",
       tool_name: "Edit",
@@ -42,7 +42,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps permission request to waiting_approval intervention", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PermissionRequest",
       cwd: "/Users/me/my-app",
       tool_name: "Bash",
@@ -57,7 +57,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps ExitPlanMode PermissionRequest to a plan interaction, not a yes/no permission", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PermissionRequest",
       cwd: "/Users/me/my-app",
       tool_name: "ExitPlanMode",
@@ -78,7 +78,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("marks permission requests as always-capable when Claude sends session suggestions", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PermissionRequest",
       cwd: "/Users/me/my-app",
       tool_name: "Bash",
@@ -98,7 +98,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps user prompt submit to thinking with task anchor", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "UserPromptSubmit",
       cwd: "/Users/me/my-app",
       prompt: "Add Claude hooks to AgentCard"
@@ -112,7 +112,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps notification idle prompt to waiting_input", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "Notification",
       cwd: "/Users/me/my-app",
       notification_type: "idle_prompt",
@@ -124,7 +124,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("extracts lettered idle prompt choices into an answerable question", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "Notification",
       cwd: "/Users/me/my-app",
       notification_type: "idle_prompt",
@@ -146,7 +146,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps generic permission notifications to terminal attention, not an actionable permission", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "Notification",
       cwd: "/Users/me/my-app",
       notification_type: "permission_prompt",
@@ -162,7 +162,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps AskUserQuestion PreToolUse to a question interaction, not permission", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PreToolUse",
       cwd: "/Users/me/my-app",
       tool_name: "AskUserQuestion",
@@ -182,7 +182,7 @@ describe("claudeHookEvent", () => {
   });
 
   it("maps ExitPlanMode PreToolUse to a plan interaction", () => {
-    const event = mapClaudeHookToIslandEvent({
+    const event = mapClaudeHookToAgentCardEvent({
       hook_event_name: "PreToolUse",
       cwd: "/Users/me/my-app",
       tool_name: "ExitPlanMode",

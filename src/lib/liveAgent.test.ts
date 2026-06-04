@@ -1,29 +1,29 @@
 import { describe, expect, it } from "vitest";
 import {
-  isIslandSnapshot,
-  resolveIslandHttpUrl,
-  resolveIslandWsUrl
-} from "./liveIsland";
+  isAgentSnapshot,
+  resolveAgentCardHttpUrl,
+  resolveAgentCardWsUrl
+} from "./liveAgent";
 
-describe("liveIsland", () => {
+describe("liveAgent", () => {
   it("uses the AgentCard server port when the UI is served by Vite", () => {
-    expect(resolveIslandWsUrl("http://localhost:5173/")).toBe(
+    expect(resolveAgentCardWsUrl("http://localhost:5173/")).toBe(
       "ws://localhost:4317/ws"
     );
   });
 
   it("uses the current origin when the AgentCard server serves the UI", () => {
-    expect(resolveIslandWsUrl("http://127.0.0.1:4317/")).toBe(
+    expect(resolveAgentCardWsUrl("http://127.0.0.1:4317/")).toBe(
       "ws://127.0.0.1:4317/ws"
     );
-    expect(resolveIslandHttpUrl("http://127.0.0.1:4317/")).toBe(
+    expect(resolveAgentCardHttpUrl("http://127.0.0.1:4317/")).toBe(
       "http://127.0.0.1:4317"
     );
   });
 
-  it("accepts valid island snapshots", () => {
+  it("accepts valid agent snapshots", () => {
     expect(
-      isIslandSnapshot({
+      isAgentSnapshot({
         agent: "claude",
         agentLabel: "Claude",
         project: "AgentCard",

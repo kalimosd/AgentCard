@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { liveInterventionResetKey } from "./useIslandDemo";
+import { liveInterventionResetKey } from "./useAgentDemo";
 import type { InterventionCard } from "../types";
 
 describe("liveInterventionResetKey", () => {

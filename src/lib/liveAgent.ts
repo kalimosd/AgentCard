@@ -1,22 +1,24 @@
-import type { IslandSnapshot } from "../types";
+import type { AgentSnapshot } from "../types";
 
-export function resolveIslandServerOrigin(href: string): string {
+export function resolveAgentCardServerOrigin(href: string): string {
   const url = new URL(href);
+  // Always use the default AgentCard port (4317) in production.
+  // In dev (Vite on :5173), the env var or default port is used.
   const port = url.port === "4317" ? url.port : "4317";
   return `${url.protocol}//${url.hostname}:${port}`;
 }
 
-export function resolveIslandWsUrl(href: string): string {
-  return `${resolveIslandServerOrigin(href).replace(/^http/, "ws")}/ws`;
+export function resolveAgentCardWsUrl(href: string): string {
+  return `${resolveAgentCardServerOrigin(href).replace(/^http/, "ws")}/ws`;
 }
 
-export function resolveIslandHttpUrl(href: string): string {
-  return resolveIslandServerOrigin(href);
+export function resolveAgentCardHttpUrl(href: string): string {
+  return resolveAgentCardServerOrigin(href);
 }
 
-export function isIslandSnapshot(value: unknown): value is IslandSnapshot {
+export function isAgentSnapshot(value: unknown): value is AgentSnapshot {
   if (!value || typeof value !== "object") return false;
-  const snapshot = value as Partial<IslandSnapshot>;
+  const snapshot = value as Partial<AgentSnapshot>;
 
   return (
     typeof snapshot.agent === "string" &&

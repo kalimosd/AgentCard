@@ -9,26 +9,26 @@ import {
   isWorkingState,
   nextScenarioIndex,
   quotaTone
-} from "./islandDemo";
-import { islandScenarios } from "../data/islandScenarios";
+} from "./agentDemo";
+import { agentScenarios } from "../data/agentScenarios";
 
-describe("islandDemo", () => {
+describe("agentDemo", () => {
   it("keeps every scenario anchored to a recent action and summary", () => {
-    for (const scenario of islandScenarios) {
+    for (const scenario of agentScenarios) {
       expect(scenario.recentAction.trim().length).toBeGreaterThan(0);
       expect(scenario.lastSummary.trim().length).toBeGreaterThan(0);
     }
   });
 
   it("keeps the v0.1 demo focused on one primary session", () => {
-    for (const scenario of islandScenarios) {
+    for (const scenario of agentScenarios) {
       expect("otherSessions" in scenario).toBe(false);
     }
   });
 
   it("covers all MVP intervention card scenarios", () => {
     const kinds = new Set(
-      islandScenarios
+      agentScenarios
         .map((scenario) => scenario.intervention?.kind)
         .filter(Boolean)
     );
@@ -45,7 +45,7 @@ describe("islandDemo", () => {
   });
 
   it("includes a long-form numbered question scenario for agent direction choices", () => {
-    const questionScenario = islandScenarios.find(
+    const questionScenario = agentScenarios.find(
       (scenario) => scenario.intervention?.kind === "waiting_input"
     );
 
@@ -77,20 +77,20 @@ describe("islandDemo", () => {
   });
 
   it("computes elapsed from session start", () => {
-    const snapshot = islandScenarios[2];
+    const snapshot = agentScenarios[2];
     const started = snapshot.sessionStartedAt;
     expect(getElapsedMs(snapshot, started + 10000)).toBe(10000);
   });
 
   it("detects intervention cards", () => {
-    const withCard = islandScenarios.find((s) => s.intervention);
-    const without = islandScenarios[0];
+    const withCard = agentScenarios.find((s) => s.intervention);
+    const without = agentScenarios[0];
     expect(hasIntervention(withCard?.intervention)).toBe(true);
     expect(hasIntervention(without.intervention)).toBe(false);
   });
 
   it("cycles scenario index", () => {
-    const total = islandScenarios.length;
+    const total = agentScenarios.length;
     expect(nextScenarioIndex(total - 1, total)).toBe(0);
     expect(nextScenarioIndex(2, total)).toBe(3);
   });

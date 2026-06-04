@@ -1,6 +1,6 @@
 export type AgentKind = "codex" | "claude" | "gemini";
 
-export type IslandState =
+export type AgentState =
   | "idle"
   | "starting"
   | "thinking"
@@ -48,13 +48,13 @@ export interface EventTailItem {
   text: string;
 }
 
-export interface IslandSnapshot {
+export interface AgentSnapshot {
   agent: AgentKind;
   agentLabel: string;
   project: string;
   sessionTitle: string;
   taskPrompt: string;
-  state: IslandState;
+  state: AgentState;
   recentAction: string;
   lastSummary: string;
   currentTool: CurrentTool;

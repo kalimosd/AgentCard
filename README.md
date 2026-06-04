@@ -98,7 +98,7 @@ npm run agentcard -- run claude
 
 若要用非交互一次性任务：`npm run agentcard -- run claude -p "review this repo"`。
 
-旧的 `island` npm script / bin 仍保留为兼容别名；新的文档和产品名统一使用 AgentCard。
+旧的 `island` 产品名已在代码中统一为 AgentCard，不再保留兼容别名。
 
 ## MVP 模块
 

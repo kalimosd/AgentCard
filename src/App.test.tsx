@@ -2,8 +2,9 @@
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import App, {
-  beaverExpressionForState,
+import App from "./App";
+import { beaverExpressionForState } from "./components/BeaverLogo";
+import {
   displaySessionTitle,
   permissionDecisionLabelsForIntervention,
   isQuestionOptionAnswerable,
@@ -13,7 +14,7 @@ import App, {
   questionOptionParts,
   questionOptionsForIntervention,
   shouldShowInterventionActions
-} from "./App";
+} from "./components/interventionUtils";
 import type { InterventionCard } from "./types";
 
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
@@ -100,7 +101,7 @@ describe("App UI cases", () => {
     ]);
   });
 
-  it("allows plan approval choices from the island but keeps text feedback in terminal", () => {
+  it("allows plan approval choices from AgentCard but keeps text feedback in terminal", () => {
     const plan: InterventionCard = {
       kind: "waiting_input",
       interactionKind: "plan",

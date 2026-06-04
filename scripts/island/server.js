@@ -123,7 +123,7 @@ export function createIslandHttpServer({
           recentAction: questionDecisionAction(result),
           lastSummary:
             result.status === "answered"
-              ? "问题已在 Agent Island 副屏回答，Claude 继续执行。"
+              ? "问题已在 AgentCard 副屏回答，Claude 继续执行。"
               : "问题已跳过，Claude 回到 terminal 原生流程。",
           clearIntervention: true
         });
@@ -188,8 +188,8 @@ export function createIslandHttpServer({
           state: "thinking",
           recentAction: permissionDecisionAction(status),
           lastSummary: approved
-            ? "权限已在 Agent Island 副屏批准。"
-            : "权限已在 Agent Island 副屏拒绝。",
+            ? "权限已在 AgentCard 副屏批准。"
+            : "权限已在 AgentCard 副屏拒绝。",
           clearIntervention: true
         });
         broadcaster.broadcast(snapshot);
@@ -296,7 +296,7 @@ export async function startIslandServer({ port }) {
     server.listen(port, "0.0.0.0", resolve);
   });
 
-  console.log(`Agent Island server listening on http://127.0.0.1:${port}`);
+  console.log(`AgentCard server listening on http://127.0.0.1:${port}`);
   return server;
 }
 

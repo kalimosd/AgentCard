@@ -3,14 +3,14 @@ import { describe, expect, it } from "vitest";
 import { createStartingEvent } from "./eventModel.js";
 import { createIslandHttpServer, createIslandStateStore } from "./server.js";
 
-describe("island server", () => {
+describe("AgentCard server", () => {
   it("updates the latest snapshot from wrapper events", () => {
-    const store = createIslandStateStore({ project: "AgentDock" });
+    const store = createIslandStateStore({ project: "AgentCard" });
 
     store.applyEvent(
       createStartingEvent({
         command: ["claude"],
-        cwd: "/Users/me/AgentDock",
+        cwd: "/Users/me/AgentCard",
         timestamp: 1760000000000
       })
     );
@@ -19,18 +19,18 @@ describe("island server", () => {
 
     expect(snapshot).toMatchObject({
       agent: "claude",
-      project: "AgentDock",
+      project: "AgentCard",
       state: "starting",
       recentAction: "Starting claude"
     });
   });
 
   it("clears typed interactions when the active intervention is cleared", () => {
-    const store = createIslandStateStore({ project: "AgentDock" });
+    const store = createIslandStateStore({ project: "AgentCard" });
 
     const permission = store.applyEvent({
       agent: "claude",
-      project: "AgentDock",
+      project: "AgentCard",
       state: "waiting_approval",
       message: "Permission: Bash — npm test",
       timestamp: 1760000000000,
@@ -52,7 +52,7 @@ describe("island server", () => {
 
     const reading = store.applyEvent({
       agent: "claude",
-      project: "AgentDock",
+      project: "AgentCard",
       state: "reading",
       message: "Read: App.tsx",
       timestamp: 1760000001000,
@@ -65,19 +65,19 @@ describe("island server", () => {
   });
 
   it("exposes capped diagnostic events for local debugging", async () => {
-    const server = createIslandHttpServer({ project: "AgentDock" });
+    const server = createIslandHttpServer({ project: "AgentCard" });
 
     await requestServer(server, {
       method: "POST",
       url: "/events",
       body: {
         agent: "claude",
-        project: "AgentDock",
+        project: "AgentCard",
         state: "reading",
         message: "Read: package.json",
         timestamp: 1760000000000,
         command: ["claude"],
-        cwd: "/Users/me/AgentDock"
+        cwd: "/Users/me/AgentCard"
       }
     });
 
@@ -99,7 +99,7 @@ describe("island server", () => {
   });
 
   it("creates answerable question interventions and resolves answers", async () => {
-    const server = createIslandHttpServer({ project: "AgentDock" });
+    const server = createIslandHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",
@@ -111,12 +111,12 @@ describe("island server", () => {
         },
         event: {
           agent: "claude",
-          project: "AgentDock",
+          project: "AgentCard",
           state: "waiting_input",
           message: "AskUserQuestion: 选择方向",
           timestamp: 1760000000000,
           command: ["claude"],
-          cwd: "/Users/me/AgentDock",
+          cwd: "/Users/me/AgentCard",
           interactionKind: "question",
           interactionTitle: "需要回答",
           questionText: "选择方向",
@@ -164,7 +164,7 @@ describe("island server", () => {
   });
 
   it("creates multi-question interventions and resolves grouped answers", async () => {
-    const server = createIslandHttpServer({ project: "AgentDock" });
+    const server = createIslandHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",
@@ -176,12 +176,12 @@ describe("island server", () => {
         },
         event: {
           agent: "claude",
-          project: "AgentDock",
+          project: "AgentCard",
           state: "waiting_input",
           message: "AskUserQuestion: 多题选择",
           timestamp: 1760000000000,
           command: ["claude"],
-          cwd: "/Users/me/AgentDock",
+          cwd: "/Users/me/AgentCard",
           interactionKind: "question",
           interactionTitle: "需要回答",
           questionText: "你希望我接下来以哪种方式协作？",
@@ -271,7 +271,7 @@ describe("island server", () => {
   });
 
   it("marks parsed terminal choice questions as answerable in the snapshot", async () => {
-    const server = createIslandHttpServer({ project: "AgentDock" });
+    const server = createIslandHttpServer({ project: "AgentCard" });
 
     const created = await requestServer(server, {
       method: "POST",
@@ -283,12 +283,12 @@ describe("island server", () => {
         },
         event: {
           agent: "claude",
-          project: "AgentDock",
+          project: "AgentCard",
           state: "waiting_input",
           message: "你选哪种方式？",
           timestamp: 1760000000000,
           command: ["claude"],
-          cwd: "/Users/me/AgentDock",
+          cwd: "/Users/me/AgentCard",
           interactionKind: "question",
           interactionTitle: "需要回答",
           questionText: "你选哪种方式？",

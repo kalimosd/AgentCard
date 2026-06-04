@@ -1,10 +1,10 @@
-# AgentDock MVP Implementation Plan
+# AgentCard MVP Implementation Plan
 
-> 状态：已废弃。本文档记录的是早期 AgentDock dashboard 原型方向。当前产品方向是 Agent Island：面向 CLI AI coding agent 的副屏状态岛。后续工作以 `README.md`、`docs/product-requirements.md` 和 `docs/roadmap.md` 为准。
+> 状态：已废弃。本文档记录的是早期 AgentCard dashboard 原型方向。当前产品方向是 AgentCard：面向 CLI AI coding agent 的副屏状态岛。后续工作以 `README.md`、`docs/product-requirements.md` 和 `docs/roadmap.md` 为准。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a first runnable AgentDock web app prototype that presents AI coding agents as a visual dashboard with status, permissions, queue, logs, and project context.
+**Goal:** Build a first runnable AgentCard web app prototype that presents AI coding agents as a visual dashboard with status, permissions, queue, logs, and project context.
 
 **Architecture:** Use a Vite React TypeScript app with static mock data and one tested dashboard summary helper. Keep the MVP local-first and UI-only so the product shape can be evaluated before adding real agent integrations.
 
@@ -51,9 +51,9 @@
 ### Task 4: Target Project Setup
 
 **Files:**
-- Create target directory: `/Users/zhanchidong/code/AgentDock`
+- Create target directory: `/Users/zhanchidong/code/AgentCard`
 
-- [x] **Step 1:** Copy verified project files to `/Users/zhanchidong/code/AgentDock`.
+- [x] **Step 1:** Copy verified project files to `/Users/zhanchidong/code/AgentCard`.
 - [x] **Step 2:** Install dependencies.
 - [x] **Step 3:** Run `npm test` and `npm run build`.
 - [x] **Step 4:** Initialize a fresh git repository in the target project.

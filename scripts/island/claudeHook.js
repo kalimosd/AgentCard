@@ -2,7 +2,10 @@
 import { pathToFileURL } from "node:url";
 import { mapClaudeHookToIslandEvent } from "./claudeHookEvent.js";
 
-const serverUrl = process.env.ISLAND_SERVER_URL ?? "http://127.0.0.1:4317";
+const serverUrl =
+  process.env.AGENTCARD_SERVER_URL ??
+  process.env.ISLAND_SERVER_URL ??
+  "http://127.0.0.1:4317";
 
 async function main() {
   const input = await readStdin();
@@ -25,7 +28,10 @@ export async function routeClaudeHookPayload(
   payload,
   {
     postJson: post = postJson,
-    preToolPermissionMode = process.env.ISLAND_PRETOOL_PERMISSION_MODE ?? "observe"
+    preToolPermissionMode =
+      process.env.AGENTCARD_PRETOOL_PERMISSION_MODE ??
+      process.env.ISLAND_PRETOOL_PERMISSION_MODE ??
+      "observe"
   } = {}
 ) {
   if (payload.hook_event_name === "PreToolUse") {
@@ -89,7 +95,7 @@ async function handlePermissionRequest(
       : await post(`/permissions/${permission.id}/wait`, { timeoutMs: 300000 });
     return buildPermissionDecisionOutput(payload, decision.status);
   } catch {
-    // If Agent Island is unavailable, fall back to Claude Code's native prompt.
+    // If AgentCard is unavailable, fall back to Claude Code's native prompt.
     return null;
   }
 }
@@ -109,7 +115,7 @@ async function handleQuestionRequest(payload, { postJson: post = postJson } = {}
     });
     return buildQuestionAnswerOutput(payload, answer);
   } catch {
-    // If Agent Island is unavailable, fall back to Claude Code's native prompt.
+    // If AgentCard is unavailable, fall back to Claude Code's native prompt.
     return null;
   }
 }
@@ -128,7 +134,7 @@ async function handlePlanChoiceRequest(
     });
     return buildPlanChoiceOutput(payload, answer);
   } catch {
-    // If Agent Island is unavailable, fall back to Claude Code's native prompt.
+    // If AgentCard is unavailable, fall back to Claude Code's native prompt.
     return null;
   }
 }
@@ -142,7 +148,7 @@ export function buildPermissionDecisionOutput(payload, decision) {
         hookEventName: "PreToolUse",
         permissionDecision: behavior,
         ...(behavior === "deny"
-          ? { permissionDecisionReason: "Denied from Agent Island" }
+          ? { permissionDecisionReason: "Denied from AgentCard" }
           : {})
       }
     };
@@ -232,7 +238,7 @@ export function buildPlanChoiceOutput(payload, result) {
   }
 
   const updatedInput = { ...(payload.tool_input ?? {}) };
-  const additionalContext = `User selected this plan option from AgentDock: ${result.answer}`;
+  const additionalContext = `User selected this plan option from AgentCard: ${result.answer}`;
 
   if (payload.hook_event_name === "PreToolUse") {
     return {
@@ -442,7 +448,7 @@ async function postJson(pathname, body) {
   });
 
   if (!response.ok) {
-    throw new Error(`Island server ${pathname} failed: ${response.status}`);
+    throw new Error(`AgentCard server ${pathname} failed: ${response.status}`);
   }
 
   if (response.status === 204) return null;

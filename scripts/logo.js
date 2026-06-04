@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Agent Island — pixel orca (虎鲸) terminal logo
+// AgentCard — pixel orca (虎鲸) terminal logo
 // Front-facing chibi orca. Characters carry shape; color is enhancement.
 //   █▄ = black body  ░ = white eye patches  ▓ = white chin/belly
 
@@ -48,6 +48,6 @@ out += R + "\n";
 
 // Label
 const L = "\x1b[38;2;80;190;225m";
-out += `\n  ${B}${L}▸ Agent Island${R}  \x1b[2morca keeps watch${R}\n\n`;
+out += `\n  ${B}${L}▸ AgentCard${R}  \x1b[2morca keeps watch${R}\n\n`;
 
 console.log(out);

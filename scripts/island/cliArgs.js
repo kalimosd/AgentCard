@@ -6,32 +6,38 @@ export function parseCliArgs(argv, env = process.env) {
   if (mode === "server") {
     return {
       mode: "server",
-      port: readPort(rest, env.ISLAND_PORT)
+      port: readPort(rest, env.AGENTCARD_PORT ?? env.ISLAND_PORT)
     };
   }
 
   if (mode === "run") {
-    const { command, serverUrl } = parseRunArgs(rest, env.ISLAND_SERVER_URL);
+    const { command, serverUrl } = parseRunArgs(
+      rest,
+      env.AGENTCARD_SERVER_URL ?? env.ISLAND_SERVER_URL
+    );
     if (command.length === 0) {
-      return { mode: "help", error: "Missing command for island run" };
+      return { mode: "help", error: "Missing command for agentcard run" };
     }
     return { mode: "run", command, serverUrl };
   }
 
   if (mode === "claude") {
-    const { command, serverUrl } = parseRunArgs(rest, env.ISLAND_SERVER_URL);
+    const { command, serverUrl } = parseRunArgs(
+      rest,
+      env.AGENTCARD_SERVER_URL ?? env.ISLAND_SERVER_URL
+    );
     return { mode: "claude", command: ["claude", ...command], serverUrl };
   }
 
   if (mode === "setup") {
     if (rest[0] !== "claude") {
-      return { mode: "help", error: "Only `island setup claude` is supported right now" };
+      return { mode: "help", error: "Only `agentcard setup claude` is supported right now" };
     }
     const target = rest.includes("--global") ? "global" : "project";
     return {
       mode: "setup",
       target,
-      serverUrl: env.ISLAND_SERVER_URL ?? DEFAULT_SERVER_URL
+      serverUrl: env.AGENTCARD_SERVER_URL ?? env.ISLAND_SERVER_URL ?? DEFAULT_SERVER_URL
     };
   }
 
@@ -72,17 +78,17 @@ function parseRunArgs(args, envServerUrl) {
 export function usage() {
   return [
     "Usage:",
-    "  island server [--port 4317]",
-    "  island claude [--server http://127.0.0.1:4317] [...claude args]",
-    "  island run [--server http://127.0.0.1:4317] <command> [...args]",
-    "  island setup claude [--global]",
+    "  agentcard server [--port 4317]",
+    "  agentcard claude [--server http://127.0.0.1:4317] [...claude args]",
+    "  agentcard run [--server http://127.0.0.1:4317] <command> [...args]",
+    "  agentcard setup claude [--global]",
     "",
     "Examples:",
-    "  island server",
-    "  island claude",
-    "  island claude --model sonnet",
-    "  island setup claude",
-    "  island run claude",
-    "  island run npm test"
+    "  agentcard server",
+    "  agentcard claude",
+    "  agentcard claude --model sonnet",
+    "  agentcard setup claude",
+    "  agentcard run claude",
+    "  agentcard run npm test"
   ].join("\n");
 }

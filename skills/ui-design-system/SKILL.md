@@ -1,6 +1,6 @@
 ---
 name: ui-design-system
-description: Use before creating or changing visual styles, CSS, layout, typography, color, spacing, components, or responsive UI for Agent Island, AI workspaces, dashboards, landing pages, or productivity app surfaces.
+description: Use before creating or changing visual styles, CSS, layout, typography, color, spacing, components, or responsive UI for AgentCard, AI workspaces, dashboards, landing pages, or productivity app surfaces.
 ---
 
 # UI Design System

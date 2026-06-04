@@ -15,14 +15,14 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "未启动",
-    taskPrompt: "等待用户通过 island run codex 启动当前 agent session",
+    taskPrompt: "等待用户通过 agentcard run codex 启动当前 agent session",
     state: "idle",
     recentAction: "等待启动命令",
     lastSummary: "当前没有活跃 agent；状态岛保持安静待命。",
     currentTool: { kind: "none", label: "—" },
-    eventTail: [{ time: "—", text: "Idle: waiting for island run codex" }],
+    eventTail: [{ time: "—", text: "Idle: waiting for agentcard run codex" }],
     model: "gpt-5-codex",
     sessionStartedAt: 0,
     usage: { ...baseUsage, sessionTokens: 0, quota5hPercent: 18 }
@@ -30,16 +30,16 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
-    sessionTitle: "启动 Agent Island demo",
+    project: "agentcard-demo",
+    sessionTitle: "启动 AgentCard demo",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "starting",
     recentAction: "Spawn: codex CLI",
     lastSummary: "Codex 已启动，正在加载当前项目上下文。",
-    currentTool: { kind: "bash", label: "island run codex" },
+    currentTool: { kind: "bash", label: "agentcard run codex" },
     eventTail: [
       { time: "23:40:01", text: "Spawn: codex CLI" },
-      { time: "23:40:02", text: "Load workspace agent-island-demo" }
+      { time: "23:40:02", text: "Load workspace agentcard-demo" }
     ],
     model: "gpt-5-codex",
     sessionStartedAt: started(4000),
@@ -48,7 +48,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "收敛 v0.1 信息层",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "thinking",
@@ -67,7 +67,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "读取当前实现",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "reading",
@@ -86,7 +86,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "更新状态岛 demo",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "editing",
@@ -105,7 +105,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "运行测试",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "running_command",
@@ -124,7 +124,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "等待权限确认",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "waiting_approval",
@@ -142,14 +142,14 @@ export const islandScenarios: IslandSnapshot[] = [
     intervention: {
       kind: "waiting_approval",
       title: "等待权限确认",
-      detail: "Codex 请求在 agent-island-demo 目录执行测试。",
-      payload: "Allow command: npm test\nCwd: ~/code/AgentDock\nRisk: executes project test suite"
+      detail: "Codex 请求在 agentcard-demo 目录执行测试。",
+      payload: "Allow command: npm test\nCwd: ~/code/AgentCard\nRisk: executes project test suite"
     }
   },
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "命令执行失败",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "failed",
@@ -174,7 +174,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "测试失败",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "failed",
@@ -206,7 +206,7 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
+    project: "agentcard-demo",
     sessionTitle: "等待用户回答",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "waiting_input",
@@ -237,8 +237,8 @@ export const islandScenarios: IslandSnapshot[] = [
   {
     agent: "codex",
     agentLabel: "Codex",
-    project: "agent-island-demo",
-    sessionTitle: "Agent Island v0.1 已对齐",
+    project: "agentcard-demo",
+    sessionTitle: "AgentCard v0.1 已对齐",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "completed",
     recentAction: "Stop: task complete",
@@ -257,7 +257,7 @@ export const islandScenarios: IslandSnapshot[] = [
       title: "任务完成",
       detail: "v0.1 demo 已回到单个主状态岛。",
       payload:
-        "Done: 单 session 状态岛\nSession: ~18.4k tokens (estimated)\nNext: v0.2 island server + wrapper"
+        "Done: 单 session 状态岛\nSession: ~18.4k tokens (estimated)\nNext: v0.2 AgentCard server + wrapper"
     }
   }
 ];

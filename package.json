@@ -1,14 +1,18 @@
 {
-  "name": "agent-island",
+  "name": "agentcard",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
+    "agentcard": "scripts/island.js",
     "island": "scripts/island.js"
   },
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
+    "agentcard": "node scripts/island.js",
+    "agentcard:server": "node scripts/island.js server",
+    "agentcard:setup-claude": "node scripts/island.js setup claude",
     "island": "node scripts/island.js",
     "island:server": "node scripts/island.js server",
     "island:setup-claude": "node scripts/island.js setup claude",

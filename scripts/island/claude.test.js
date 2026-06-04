@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { launchClaude, readServerPort } from "./claude.js";
 
 describe("claude launcher", () => {
-  it("reuses an existing island server", async () => {
+  it("reuses an existing AgentCard server", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ ok: true })
@@ -36,7 +36,7 @@ describe("claude launcher", () => {
     });
   });
 
-  it("starts and closes an island server when none is running", async () => {
+  it("starts and closes an AgentCard server when none is running", async () => {
     let closed = false;
     const fetchImpl = vi.fn().mockRejectedValue(new Error("offline"));
     const startServer = vi.fn().mockResolvedValue({

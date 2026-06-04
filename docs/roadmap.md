@@ -1,8 +1,8 @@
-# Agent Island 路线图
+# AgentCard 路线图
 
 更新日期：2026-06-02
 
-这份路线图用于保持 Agent Island 聚焦：它是 CLI coding agent 的副屏控制面，不是通用 dashboard。核心闭环是：观察当前 agent、识别正确介入类型、让用户安全回应、必要时跳回 terminal。
+这份路线图用于保持 AgentCard 聚焦：它是 CLI coding agent 的副屏控制面，不是通用 dashboard。核心闭环是：观察当前 agent、识别正确介入类型、让用户安全回应、必要时跳回 terminal。
 
 ## v0.1：产品方向对齐 Demo
 
@@ -36,8 +36,8 @@
 
 范围：
 
-- `island server`
-- `island run <command>`
+- `agentcard server`
+- `agentcard run <command>`
 - 本地托管构建后的 UI
 - `/health` 和 `/snapshot`
 - WebSocket snapshot 更新
@@ -90,7 +90,7 @@ hook bridge 不应长期把每个 `PreToolUse` 都当成权限请求。这样会
 - Claude Code 活动无需 terminal scraping 即可改变小岛状态
 - 权限 notification 不会覆盖详细权限卡片
 - 失败和会话结束可见
-- Agent Island 离线时，Claude Code 原生 terminal prompt 仍可工作
+- AgentCard 离线时，Claude Code 原生 terminal prompt 仍可工作
 
 ## v0.4：Typed Interaction Queues
 

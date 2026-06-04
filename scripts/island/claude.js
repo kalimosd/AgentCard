@@ -21,7 +21,7 @@ export async function launchClaude({
     }
 
     const settingsPath = installHooks({ target: "project", serverUrl });
-    logger.info?.(`Agent Island: Claude hooks ready in ${settingsPath}`);
+    logger.info?.(`AgentCard: Claude hooks ready in ${settingsPath}`);
 
     return await runCommand({ command, serverUrl, showSetupHint: false });
   } finally {
@@ -47,7 +47,7 @@ export function readServerPort(serverUrl) {
   const port = Number(url.port || 4317);
 
   if (!Number.isInteger(port) || port <= 0 || port > 65535) {
-    throw new Error(`Invalid island server URL port: ${serverUrl}`);
+    throw new Error(`Invalid AgentCard server URL port: ${serverUrl}`);
   }
 
   return port;

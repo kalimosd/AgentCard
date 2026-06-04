@@ -6,13 +6,13 @@ import {
 } from "./liveIsland";
 
 describe("liveIsland", () => {
-  it("uses the island server port when the UI is served by Vite", () => {
+  it("uses the AgentCard server port when the UI is served by Vite", () => {
     expect(resolveIslandWsUrl("http://localhost:5173/")).toBe(
       "ws://localhost:4317/ws"
     );
   });
 
-  it("uses the current origin when the island server serves the UI", () => {
+  it("uses the current origin when the AgentCard server serves the UI", () => {
     expect(resolveIslandWsUrl("http://127.0.0.1:4317/")).toBe(
       "ws://127.0.0.1:4317/ws"
     );
@@ -26,9 +26,9 @@ describe("liveIsland", () => {
       isIslandSnapshot({
         agent: "claude",
         agentLabel: "Claude",
-        project: "AgentDock",
+        project: "AgentCard",
         sessionTitle: "启动 agent",
-        taskPrompt: "island run claude",
+        taskPrompt: "agentcard run claude",
         state: "starting",
         recentAction: "Starting claude",
         lastSummary: "claude 已启动",

@@ -5,10 +5,10 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../..");
 const hookScript = path.join(rootDir, "scripts/island/claudeHook.js");
-const marker = "agent-island-claude-hook";
+const marker = "agentcard-claude-hook";
 
 export function buildClaudeHookEntries(serverUrl = "http://127.0.0.1:4317") {
-  const command = `AGENT_ISLAND_HOOK=${marker} ISLAND_SERVER_URL=${serverUrl} ISLAND_PRETOOL_PERMISSION_MODE=gate node "${hookScript}"`;
+  const command = `AGENTCARD_HOOK=${marker} AGENTCARD_SERVER_URL=${serverUrl} AGENTCARD_PRETOOL_PERMISSION_MODE=gate node "${hookScript}"`;
   const observeEntry = {
     type: "command",
     command,
@@ -65,7 +65,10 @@ function isIslandMatcher(matcher) {
 export function installClaudeHooks({
   target = "project",
   cwd = process.cwd(),
-  serverUrl = process.env.ISLAND_SERVER_URL ?? "http://127.0.0.1:4317"
+  serverUrl =
+    process.env.AGENTCARD_SERVER_URL ??
+    process.env.ISLAND_SERVER_URL ??
+    "http://127.0.0.1:4317"
 } = {}) {
   const settingsPath =
     target === "global"

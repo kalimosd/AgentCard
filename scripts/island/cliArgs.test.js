@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseCliArgs } from "./cliArgs.js";
 
-describe("island cli args", () => {
+describe("agentcard cli args", () => {
   it("parses the one-command Claude launcher", () => {
     expect(parseCliArgs(["claude"])).toEqual({
       mode: "claude",

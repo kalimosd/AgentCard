@@ -36,8 +36,8 @@ async function main() {
       target: parsed.target,
       serverUrl: parsed.serverUrl
     });
-    console.log(`Installed Agent Island Claude hooks into ${settingsPath}`);
-    console.log("Restart Claude Code in this project, then use island claude.");
+    console.log(`Installed AgentCard Claude hooks into ${settingsPath}`);
+    console.log("Restart Claude Code in this project, then use agentcard claude.");
     return;
   }
 

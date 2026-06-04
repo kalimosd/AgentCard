@@ -72,7 +72,7 @@ export function useIslandDemo() {
             : "已在副屏拒绝该权限请求。"
         );
       } catch {
-        setActionFeedback("无法连接 island server，请确认服务是否在运行。");
+        setActionFeedback("无法连接 AgentCard server，请确认服务是否在运行。");
       }
     },
     []
@@ -85,7 +85,7 @@ export function useIslandDemo() {
         setDismissedIntervention(true);
         setActionFeedback(`已在副屏选择「${answer}」，Claude 会继续执行。`);
       } catch {
-        setActionFeedback("无法连接 island server，请确认服务是否在运行。");
+        setActionFeedback("无法连接 AgentCard server，请确认服务是否在运行。");
       }
     },
     []
@@ -100,7 +100,7 @@ export function useIslandDemo() {
           `已在副屏选择 ${answers.length} 项，Claude 会继续执行。`
         );
       } catch {
-        setActionFeedback("无法连接 island server，请确认服务是否在运行。");
+        setActionFeedback("无法连接 AgentCard server，请确认服务是否在运行。");
       }
     },
     []
@@ -115,7 +115,7 @@ export function useIslandDemo() {
           setActionFeedback("已释放给 Claude terminal，请回 terminal 继续处理。");
           return;
         } catch {
-          setActionFeedback("无法连接 island server，请回到运行 claude 的 terminal。");
+          setActionFeedback("无法连接 AgentCard server，请回到运行 claude 的 terminal。");
           return;
         }
       }

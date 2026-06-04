@@ -23,7 +23,7 @@ export async function runWrappedCommand({ command, serverUrl, showSetupHint = tr
       if (!warnedServer) {
         warnedServer = true;
         console.warn(
-          `Agent Island server is not reachable at ${serverUrl}; running command normally.`
+          `AgentCard server is not reachable at ${serverUrl}; running command normally.`
         );
       }
     }
@@ -35,9 +35,9 @@ export async function runWrappedCommand({ command, serverUrl, showSetupHint = tr
     await post(createInteractiveSessionEvent({ command, cwd }));
     if (showSetupHint) {
       console.info(
-        "Agent Island: interactive TTY mode. For live tool/status sync, run once in this project:"
+        "AgentCard: interactive TTY mode. For live tool/status sync, run once in this project:"
       );
-      console.info("  npm run island -- setup claude");
+      console.info("  npm run agentcard -- setup claude");
     }
 
     const exitCode = await runInteractiveChild({ command, cwd });

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make Agent Island classify real Claude Code events correctly by separating tool activity, permissions, questions, plans, attention states, diagnostics, and future jump-back context.
+**Goal:** Make AgentCard classify real Claude Code events correctly by separating tool activity, permissions, questions, plans, attention states, diagnostics, and future jump-back context.
 
 **Architecture:** Keep `IslandSnapshot` as the frontend compatibility surface, but introduce typed interaction records inside the server and event model. Claude hook handling should default to observing `PreToolUse` as activity, only entering permission waiting through explicit permission events or an explicit gating mode.
 
@@ -184,7 +184,7 @@ export async function routeClaudeHookPayload(
   payload,
   {
     postJson: post = postJson,
-    preToolPermissionMode = process.env.ISLAND_PRETOOL_PERMISSION_MODE ?? "observe"
+    preToolPermissionMode = process.env.AGENTCARD_PRETOOL_PERMISSION_MODE ?? "observe"
   } = {}
 ) {
   if (payload.hook_event_name === "PreToolUse") {
@@ -1128,7 +1128,7 @@ If `PreToolUse` still gates everything, typed queues will receive bad classifica
 
 ### Challenge 2: "Will disabling `PreToolUse` gating lose useful tablet approvals?"
 
-It may reduce approvals for environments that only expose `PreToolUse`, but the current default creates false positives and blocks normal Claude Code behavior. The plan keeps explicit `ISLAND_PRETOOL_PERMISSION_MODE=gate` for live experiments while making product default observe-only.
+It may reduce approvals for environments that only expose `PreToolUse`, but the current default creates false positives and blocks normal Claude Code behavior. The plan keeps explicit `AGENTCARD_PRETOOL_PERMISSION_MODE=gate` for live experiments while making product default observe-only.
 
 **Decision:** Pass with explicit gate mode.
 
@@ -1146,7 +1146,7 @@ The property is optional and additive. Existing frontend keeps using `interventi
 
 ### Challenge 5: "Will diagnostics leak too much?"
 
-Diagnostics are local-only but still contain sensitive prompts, commands, and paths. The plan caps entries to 50 and truncates long strings to 1200 characters. Do not expose it remotely beyond the local server surface already used by Agent Island.
+Diagnostics are local-only but still contain sensitive prompts, commands, and paths. The plan caps entries to 50 and truncates long strings to 1200 characters. Do not expose it remotely beyond the local server surface already used by AgentCard.
 
 **Decision:** Pass with capped diagnostic log.
 

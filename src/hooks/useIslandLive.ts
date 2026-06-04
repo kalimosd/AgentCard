@@ -37,7 +37,9 @@ export function useIslandLive() {
     void pullSnapshot();
 
     const wsUrl =
-      import.meta.env.VITE_ISLAND_WS_URL ?? resolveIslandWsUrl(window.location.href);
+      import.meta.env.VITE_AGENTCARD_WS_URL ??
+      import.meta.env.VITE_ISLAND_WS_URL ??
+      resolveIslandWsUrl(window.location.href);
     const socket = new WebSocket(wsUrl);
 
     socket.addEventListener("open", () => {

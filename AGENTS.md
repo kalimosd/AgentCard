@@ -1,6 +1,6 @@
-# AgentDock Agent Instructions
+# AgentCard Agent Instructions
 
-This project is AgentDock / Agent Island: an early AI agent product, agent island, agent workspace, task monitor, or AI productivity app. It is not OfferPilot. Avoid job-search-specific assumptions unless the user explicitly asks for them.
+This project is AgentCard: an early AI agent product, agent sidecar, workspace monitor, task monitor, or AI productivity app. It is not OfferPilot. Avoid job-search-specific assumptions unless the user explicitly asks for them.
 
 ## Frontend / UI Tasks
 

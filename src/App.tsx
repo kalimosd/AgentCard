@@ -429,7 +429,7 @@ function CaseTwoControlSurface({
           <p className="interaction-detail">
             {showIntervention && snapshot.intervention
               ? snapshot.intervention.detail
-              : "Agent Island 正在观察当前 agent。权限、问题、计划、失败会按类型进入这里。"}
+              : "AgentCard 正在观察当前 agent。权限、问题、计划、失败会按类型进入这里。"}
           </p>
 
           <pre className="payload-preview">
@@ -722,7 +722,7 @@ function QuestionOptionButtons({
             title={
               canAnswerQuestionOnTablet &&
               isQuestionOptionAnswerable(intervention, option, index)
-                ? "在 AgentDock 中选择这个回答"
+                ? "在 AgentCard 中选择这个回答"
                 : intervention.interactionKind === "plan"
                   ? "请回 terminal 输入文字反馈"
                 : "请回 terminal 回答"

@@ -12,18 +12,18 @@ const KNOWN_AGENTS = {
   gemini: { agent: "gemini", agentLabel: "Gemini" }
 };
 
-export function createIdleSnapshot({ project = "Agent Island" } = {}) {
+export function createIdleSnapshot({ project = "AgentCard" } = {}) {
   return {
     agent: "codex",
     agentLabel: "Codex",
     project,
     sessionTitle: "未启动",
-    taskPrompt: "等待通过 island run <command> 启动当前 agent session",
+    taskPrompt: "等待通过 agentcard run <command> 启动当前 agent session",
     state: "idle",
     recentAction: "等待启动命令",
     lastSummary: "当前没有活跃 agent；状态岛保持安静待命。",
     currentTool: { kind: "none", label: "—" },
-    eventTail: [{ time: "—", text: "Idle: waiting for island run <command>" }],
+    eventTail: [{ time: "—", text: "Idle: waiting for agentcard run <command>" }],
     model: "unknown",
     sessionStartedAt: 0,
     interactions: createInteractionQueues(),
@@ -139,7 +139,7 @@ export function eventToSnapshot(event, previous) {
       previous?.sessionTitle ??
       titleForState(event.state, commandLabel),
     taskPrompt:
-      event.taskPrompt ?? previous?.taskPrompt ?? `island run ${commandLabel}`,
+      event.taskPrompt ?? previous?.taskPrompt ?? `agentcard run ${commandLabel}`,
     state: event.state,
     recentAction,
     lastSummary: summaryForEvent(event, commandLabel),

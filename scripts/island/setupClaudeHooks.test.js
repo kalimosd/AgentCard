@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { installClaudeHooks, mergeClaudeHooks } from "./setupClaudeHooks.js";
 
 describe("setupClaudeHooks", () => {
-  it("merges island hooks without duplicating existing entries", () => {
+  it("merges AgentCard hooks without duplicating existing entries", () => {
     const merged = mergeClaudeHooks(
       {
         hooks: {
@@ -25,7 +25,7 @@ describe("setupClaudeHooks", () => {
       "claudeHook.js"
     );
     expect(String(merged.hooks.PreToolUse[0].hooks[0].command)).toContain(
-      "ISLAND_PRETOOL_PERMISSION_MODE=gate"
+      "AGENTCARD_PRETOOL_PERMISSION_MODE=gate"
     );
     expect(merged.hooks.PreToolUse[0].hooks[0].timeout).toBe(86400);
     expect(merged.hooks.PermissionRequest[0].hooks[0].timeout).toBe(86400);
@@ -33,9 +33,9 @@ describe("setupClaudeHooks", () => {
     expect(merged.hooks.UserPromptSubmit[0].hooks[0].timeout).toBe(5);
   });
 
-  it("collapses duplicate island hook entries from older setup runs", () => {
+  it("collapses duplicate AgentCard hook entries from older setup runs", () => {
     const command =
-      'ISLAND_SERVER_URL=http://127.0.0.1:4317 node "/Users/me/AgentDock/scripts/island/claudeHook.js"';
+      'ISLAND_SERVER_URL=http://127.0.0.1:4317 node "/Users/me/AgentCard/scripts/island/claudeHook.js"';
     const merged = mergeClaudeHooks(
       {
         hooks: {
@@ -52,7 +52,7 @@ describe("setupClaudeHooks", () => {
   });
 
   it("writes project settings file", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "agent-island-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "agentcard-"));
     const settingsPath = installClaudeHooks({
       target: "project",
       cwd: dir,

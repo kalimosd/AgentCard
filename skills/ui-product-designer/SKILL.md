@@ -1,6 +1,6 @@
 ---
 name: ui-product-designer
-description: Use before coding frontend pages or components when product shape, page purpose, information architecture, user goals, states, or Agent Island / AI workspace UX requirements are ambiguous. Helps turn vague AI agent product ideas into page structure before implementation.
+description: Use before coding frontend pages or components when product shape, page purpose, information architecture, user goals, states, or AgentCard / AI workspace UX requirements are ambiguous. Helps turn vague AI agent product ideas into page structure before implementation.
 ---
 
 # UI Product Designer

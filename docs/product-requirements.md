@@ -1,14 +1,14 @@
-# Agent Island 产品需求文档
+# AgentCard 产品需求文档
 
 更新日期：2026-06-02
 
 ## 一句话定义
 
-Agent Island 是一个本地优先的 CLI coding agent 副屏控制面。它让开发者在不盯 terminal 的情况下，知道当前 agent 在做什么、为什么需要介入、该用哪种方式介入，并在需要完整上下文时跳回对应 terminal。
+AgentCard 是一个本地优先的 CLI coding agent 副屏控制面。它让开发者在不盯 terminal 的情况下，知道当前 agent 在做什么、为什么需要介入、该用哪种方式介入，并在需要完整上下文时跳回对应 terminal。
 
 ## 产品定位
 
-Agent Island 不是通用 dashboard，也不是 terminal 替代品。它是一个常驻的「agent 注意力岛」：当开发者把 Claude Code、Codex CLI、Gemini CLI 或类似工具交给后台工作后，小岛负责让 agent 的状态、阻塞点和关键选择浮出水面。
+AgentCard 不是通用 dashboard，也不是 terminal 替代品。它是一个常驻的「agent 注意力岛」：当开发者把 Claude Code、Codex CLI、Gemini CLI 或类似工具交给后台工作后，小岛负责让 agent 的状态、阻塞点和关键选择浮出水面。
 
 产品应该让 AI coding agent 像一个可被观察的桌面协作者：
 
@@ -32,7 +32,7 @@ Agent Island 不是通用 dashboard，也不是 terminal 替代品。它是一�
 - 完成后安静停住
 - 消耗 token 超出预期
 
-这些信息通常都藏在 terminal 中。用户只能不断切回去看 agent 是在工作、卡住、失败，还是已经完成。Agent Island 要减少这种注意力浪费。
+这些信息通常都藏在 terminal 中。用户只能不断切回去看 agent 是在工作、卡住、失败，还是已经完成。AgentCard 要减少这种注意力浪费。
 
 ## 目标用户
 
@@ -66,13 +66,13 @@ Agent Island 不是通用 dashboard，也不是 terminal 替代品。它是一�
 - Plan review、skill 方向选择、权限确认、idle 输入、命令失败，都应该是不同卡片。
 - 通用通知，例如 `Claude needs your permission`，可能晚于更详细的工具事件到达，不能覆盖已经可操作的卡片。
 
-产品结论：Agent Island 需要一个「交互模型」，而不只是一个 `waiting_approval` 状态。
+产品结论：AgentCard 需要一个「交互模型」，而不只是一个 `waiting_approval` 状态。
 
 ## 产品原则
 
 - 当前状态优先于日志。用户几秒内要知道 agent 在干什么。
 - 介入必须分类型。权限、问题、计划、失败、完成不是同一种交互。
-- fail open。Agent Island 离线时，Claude Code 应回退到原生 terminal 行为。
+- fail open。AgentCard 离线时，Claude Code 应回退到原生 terminal 行为。
 - 不静默批准。小岛只能传递用户明确选择，不能替用户自动 approve。
 - terminal 仍是权威上下文。小岛帮助介入，但不抢 terminal 的职责。
 - 本地优先。server、hooks、WebSocket、短期状态默认留在用户本机。
@@ -84,7 +84,7 @@ Agent Island 不是通用 dashboard，也不是 terminal 替代品。它是一�
 ```text
 Claude Code / CLI agent
   -> hook 或 wrapper 事件
-  -> 本地 Agent Island server
+  -> 本地 AgentCard server
   -> 标准化 session + interaction queues
   -> WebSocket snapshot
   -> 平板 / 浏览器小岛 UI
@@ -258,7 +258,7 @@ Claude Code / CLI agent
 
 - 安全安装项目级或用户级 hooks
 - 从 stdin 读取 hook JSON
-- 映射 hook event 到 Agent Island event
+- 映射 hook event 到 AgentCard event
 - 只在合适场景等待用户显式决策
 - 输出合法 Claude Code hook response
 - 小岛不可用时保持 Claude Code 原生 terminal 行为
@@ -271,7 +271,7 @@ Claude Code / CLI agent
 - `AskUserQuestion` / `Elicitation`：需要结构化回答，不是 approve/deny。
 - `ExitPlanMode`：计划审阅语义，应避免混进普通工具权限。
 
-当前 `island claude` 安装的 Claude hook 默认启用 `ISLAND_PRETOOL_PERMISSION_MODE=gate`，用于把真实权限和结构化选择提前接入 AgentDock。通用 `Notification` 仍不可直接决策；只有服务端生成 `permissionId` 或 `questionId` 后，UI 才显示可执行按钮。
+当前 `agentcard claude` 安装的 Claude hook 默认启用 `AGENTCARD_PRETOOL_PERMISSION_MODE=gate`，用于把真实权限和结构化选择提前接入 AgentCard。通用 `Notification` 仍不可直接决策；只有服务端生成 `permissionId` 或 `questionId` 后，UI 才显示可执行按钮。
 
 ### 模块 D：Token / Cost
 
@@ -299,7 +299,7 @@ MVP 字段：
 - tmux-agent-sidebar / tmux-agent-status：terminal-native sidebar，证明 hook 状态比纯进程轮询更可靠。
 - Open Island：开源 macOS island，包含 hook bridge、session discovery、本地存储、用量、权限/问题流和多 terminal jump。
 
-Agent Island 的差异化：
+AgentCard 的差异化：
 
 - 浏览器 / 平板 / 小副屏优先，而不是 notch-only 或 tmux-only。
 - v0.1-v0.4 聚焦单一主 session 的高可读性。
@@ -333,7 +333,7 @@ Demo 成功：
 
 - 原生权限提示能在小岛上显示正确 `Yes / Always / No`（协议支持时）。
 - 非权限选择题能显示为问题卡片，且保留真实选项。
-- Agent Island 离线时，Claude Code 回退 terminal 原生提示。
+- AgentCard 离线时，Claude Code 回退 terminal 原生提示。
 - 通用通知不会覆盖详细可操作卡片。
 - 至少 3 个真实用户连续使用 3 天，并认为它减少了 terminal 检查。
 

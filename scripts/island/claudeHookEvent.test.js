@@ -101,13 +101,13 @@ describe("claudeHookEvent", () => {
     const event = mapClaudeHookToIslandEvent({
       hook_event_name: "UserPromptSubmit",
       cwd: "/Users/me/my-app",
-      prompt: "Add Claude hooks to Agent Island"
+      prompt: "Add Claude hooks to AgentCard"
     });
 
     expect(event).toMatchObject({
       state: "thinking",
-      taskPrompt: "Add Claude hooks to Agent Island",
-      sessionTitle: "Add Claude hooks to Agent Island"
+      taskPrompt: "Add Claude hooks to AgentCard",
+      sessionTitle: "Add Claude hooks to AgentCard"
     });
   });
 

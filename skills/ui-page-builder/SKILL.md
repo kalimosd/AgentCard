@@ -1,6 +1,6 @@
 ---
 name: ui-page-builder
-description: Use before implementing frontend pages, components, layouts, responsive behavior, or UI state rendering. Enforces a short UI plan, design-system compliance, component reuse, and clean implementation for Agent Island and AI workspace interfaces.
+description: Use before implementing frontend pages, components, layouts, responsive behavior, or UI state rendering. Enforces a short UI plan, design-system compliance, component reuse, and clean implementation for AgentCard and AI workspace interfaces.
 ---
 
 # UI Page Builder

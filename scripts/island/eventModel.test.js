@@ -14,9 +14,9 @@ import {
 
 describe("island event model", () => {
   it("creates an idle snapshot before a wrapped command starts", () => {
-    expect(createIdleSnapshot({ project: "AgentDock" })).toMatchObject({
+    expect(createIdleSnapshot({ project: "AgentCard" })).toMatchObject({
       agent: "codex",
-      project: "AgentDock",
+      project: "AgentCard",
       state: "idle",
       recentAction: "等待启动命令"
     });
@@ -26,7 +26,7 @@ describe("island event model", () => {
     const started = eventToSnapshot(
       createStartingEvent({
         command: ["claude", "--model", "sonnet"],
-        cwd: "/Users/me/AgentDock",
+        cwd: "/Users/me/AgentCard",
         timestamp: 1760000000000
       })
     );
@@ -34,7 +34,7 @@ describe("island event model", () => {
     expect(started).toMatchObject({
       agent: "claude",
       agentLabel: "Claude",
-      project: "AgentDock",
+      project: "AgentCard",
       state: "starting",
       recentAction: "Starting claude --model sonnet",
       currentTool: { kind: "bash", label: "claude --model sonnet" }
@@ -43,7 +43,7 @@ describe("island event model", () => {
     const output = eventToSnapshot(
       createOutputEvent({
         command: ["claude", "--model", "sonnet"],
-        cwd: "/Users/me/AgentDock",
+        cwd: "/Users/me/AgentCard",
         stream: "stdout",
         line: "Running npm test",
         timestamp: 1760000000500
@@ -60,7 +60,7 @@ describe("island event model", () => {
     const completed = eventToSnapshot(
       createExitEvent({
         command: ["claude", "--model", "sonnet"],
-        cwd: "/Users/me/AgentDock",
+        cwd: "/Users/me/AgentCard",
         exitCode: 0,
         timestamp: 1760000001000
       }),
@@ -160,7 +160,7 @@ describe("island event model", () => {
     const failed = eventToSnapshot(
       createExitEvent({
         command: ["npm", "test"],
-        cwd: "/Users/me/AgentDock",
+        cwd: "/Users/me/AgentCard",
         exitCode: 1,
         timestamp: 1760000001000
       })
@@ -182,14 +182,14 @@ describe("island event model", () => {
       timestamp: 1760000000200,
       state: "waiting_approval",
       message:
-        'Permission: Bash — open "http://localhost:3000/authorize?agent_id=agent-island-001"',
+        'Permission: Bash — open "http://localhost:3000/authorize?agent_id=agentcard-001"',
       toolKind: "bash",
       toolLabel: 'open "http://localhost:3000/authorize"',
       interventionKind: "waiting_approval",
       interventionTitle: "等待权限确认",
       interventionDetail: "Claude 请求执行 Bash，请确认。",
       interventionPayload:
-        'tool: Bash\ncommand: open "http://localhost:3000/authorize?agent_id=agent-island-001"',
+        'tool: Bash\ncommand: open "http://localhost:3000/authorize?agent_id=agentcard-001"',
       permissionId: "permission-123"
     });
 
@@ -213,7 +213,7 @@ describe("island event model", () => {
       kind: "waiting_approval",
       permissionId: "permission-123",
       payload:
-        'tool: Bash\ncommand: open "http://localhost:3000/authorize?agent_id=agent-island-001"'
+        'tool: Bash\ncommand: open "http://localhost:3000/authorize?agent_id=agentcard-001"'
     });
   });
 

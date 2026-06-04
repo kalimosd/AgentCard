@@ -210,12 +210,12 @@ export const islandScenarios: IslandSnapshot[] = [
     sessionTitle: "等待用户回答",
     taskPrompt: "按照 PRD 做 v0.1 假数据 demo，聚焦单个 agent 状态岛",
     state: "waiting_input",
-    recentAction: "AskUserQuestion: 是否继续 v0.2",
-    lastSummary: "Codex 需要用户选择下一步方向，状态岛只提醒，不代替 terminal 回复。",
+    recentAction: "AskUserQuestion: 选择下一步方向",
+    lastSummary: "Codex 需要用户在三个方向中选择，状态岛展示选项但不代替 terminal 回复。",
     currentTool: { kind: "none", label: "awaiting user" },
     eventTail: [
       { time: "23:42:55", text: "Test failure acknowledged" },
-      { time: "23:42:58", text: "AskUserQuestion: 是否继续 v0.2" },
+      { time: "23:42:58", text: "AskUserQuestion: 选择下一步方向" },
       { time: "23:42:58", text: "Blocked until reply" }
     ],
     model: "gpt-5-codex",
@@ -225,8 +225,13 @@ export const islandScenarios: IslandSnapshot[] = [
       kind: "waiting_input",
       title: "等待你的回答",
       detail: "Codex 正在 terminal 里等待用户选择下一步。",
-      payload: "Question: Continue with v0.2 wrapper after v0.1 alignment?",
-      options: ["继续 v0.2", "先 polish v0.1", "整理初始提交"]
+      payload:
+        "Question: 请选择下一步方向。\n1. 先澄清需求边界，写一份产品规格，再进入实现计划\n2. 直接实现最小可用版本，但保留后续协议回传扩展点\n3. 暂停实现，先做 Case 1 / Case 2 的视觉方案对比",
+      options: [
+        "1. 先澄清需求边界，写一份产品规格，再进入实现计划",
+        "2. 直接实现最小可用版本，但保留后续协议回传扩展点",
+        "3. 暂停实现，先做 Case 1 / Case 2 的视觉方案对比"
+      ]
     }
   },
   {

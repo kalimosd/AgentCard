@@ -3,23 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "island": "scripts/island.js"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
+    "island": "node scripts/island.js",
+    "island:server": "node scripts/island.js server",
+    "island:setup-claude": "node scripts/island.js setup claude",
     "preview": "vite preview --host",
     "test": "vitest run"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",
     "lucide-react": "^0.468.0",
-    "vite": "^6.0.0",
-    "typescript": "^5.7.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "playwright-core": "^1.60.0",
     "vitest": "^2.1.0"
   }
 }

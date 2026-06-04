@@ -33,8 +33,9 @@ Mac 本地服务
 预期使用方式：
 
 ```bash
-island server
-island run codex
+npm run build
+npm run island -- server
+npm run island -- run codex
 ```
 
 然后在平板或副屏打开：
@@ -42,6 +43,60 @@ island run codex
 ```text
 http://<mac-lan-ip>:<port>
 ```
+
+本地开发阶段默认端口是 `4317`，页面地址通常是：
+
+```text
+http://127.0.0.1:4317
+```
+
+`island run <command>` 只监控由它启动的进程。它不会改写 shell alias，也不会影响你直接输入 `claude`、`codex` 或 `gemini` 的原始用法。
+
+### 用 Claude 开真实项目（v0.3 hooks）
+
+```bash
+# 进入你的真实项目目录
+cd ~/code/你的项目
+
+# 一条命令启动 Agent Island + Claude
+node /Users/zhanchidong/code/AgentDock/scripts/island.js claude
+```
+
+`island claude` 会：
+
+- 复用已经运行的 `http://127.0.0.1:4317` island server；如果没有运行，就临时启动一个
+- 在当前项目的 `.claude/settings.json` 幂等安装 / 刷新 Claude hooks
+- 以真实交互式 TTY 启动 `claude`
+- Claude 退出后，只关闭这条命令自己临时启动的 server
+
+浏览器 / 平板打开 `http://127.0.0.1:4317`。之后副屏会同步：
+
+- 你提交的任务（`UserPromptSubmit`）
+- 读文件 / 改文件 / 跑命令（`PreToolUse`）
+- 等待权限、等待输入（`PermissionRequest` / `Notification`）
+- 工具失败（`PostToolUseFailure`）
+- **用量**：从 Claude 会话 `*.jsonl` 解析 token / 估算 cost（标记 `estimated`）
+- **权限**：协议支持时副屏显示 **Yes / Always / No**，由用户显式选择后回传给 Claude
+- **问题**：`AskUserQuestion` / skill 方向选择会渲染为问题卡片；协议支持时可在副屏点选 `1 / 2 / 3` 或 `A / B / C` 并回传给 Claude
+- **计划**：`ExitPlanMode` 会渲染为计划卡片；批准类选项可在副屏点选并回传，文字反馈类选项仍回 Claude terminal
+
+`island claude` 安装的 hook 会启用 `ISLAND_PRETOOL_PERMISSION_MODE=gate`，让可控的权限和结构化选择在进入 Claude terminal 原生确认前先到 AgentDock。只收到通用 `Claude needs your permission` 的 `Notification` 时，AgentDock 会把它当作不可执行的 terminal 注意事项，不会伪造按钮。
+
+如果你已经在旧版本里跑过 `setup claude`，也可以直接用 `island claude`；它会清理旧的 Agent Island hook 条目并写入当前版本路径。
+
+手动调试路径仍然可用：
+
+```bash
+cd /Users/zhanchidong/code/AgentDock
+npm run build
+npm run island:server
+
+cd ~/code/你的项目
+node /Users/zhanchidong/code/AgentDock/scripts/island.js setup claude
+node /Users/zhanchidong/code/AgentDock/scripts/island.js run claude
+```
+
+若要用非交互一次性任务：`npm run island -- run claude -p "review this repo"`。
 
 ## MVP 模块
 
@@ -74,13 +129,13 @@ MVP 触发场景：
 - 测试失败
 - 任务完成
 
-MVP 操作：
+v0.1 demo 操作：
 
 - `Jump Back`：跳回对应 terminal
 - `Dismiss`：忽略提醒
 - `Mark Done`：标记已处理
 
-MVP 不替用户 approve 命令，也不在平板上直接回复 agent。
+真实 hook 阶段只允许用户显式决策，不静默 approve。权限请求应渲染为 `Yes / Always / No`；非权限问题应渲染为问题卡片，避免把 skill 方向选择误判成授权。
 
 ### Token / Cost 面板
 
@@ -113,9 +168,11 @@ Agent Island 不是：
 
 - `v0.1`：假数据平板 UI demo
 - `v0.2`：Terminal wrapper，支持 `island run <command>`
-- `v0.3`：真实提醒，识别等待确认、输入、失败和完成
-- `v0.4`：Token 估算和今日 cost 面板
-- `v0.5`：多 agent session 和 session 切换
+- `v0.3`：Claude Code hook bridge，识别真实生命周期与注意力状态
+- `v0.4`：typed interaction queues，拆分权限、问题、计划、失败和完成卡片
+- `v0.5`：Token 估算、今日 cost 和 session memory
+- `v0.6`：Jump Back 到 terminal / editor 上下文
+- `v0.7`：Multi-session lite，仍保持一个主状态岛
 
 完整 PRD 见 `docs/product-requirements.md`，版本边界见 `docs/roadmap.md`。
 

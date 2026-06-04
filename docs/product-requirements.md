@@ -1,240 +1,355 @@
-# Agent Island PRD v0.1
+# Agent Island 产品需求文档
 
-## 产品一句话
+更新日期：2026-06-02
 
-Agent Island 是一个放在桌面副屏或平板上的 AI agent 状态岛，让用户不用盯 terminal，也能知道 AI 正在做什么、是否需要介入、花了多少 token 和 cost。
+## 一句话定义
 
-## 背景
+Agent Island 是一个本地优先的 CLI coding agent 副屏控制面。它让开发者在不盯 terminal 的情况下，知道当前 agent 在做什么、为什么需要介入、该用哪种方式介入，并在需要完整上下文时跳回对应 terminal。
 
-开发者使用 Codex CLI、Claude Code、Gemini CLI 等 AI coding agent 时，经常把任务交出去后切到别的窗口工作。但 agent 可能会等待确认、跑错命令、测试失败、卡住或消耗大量 token。
+## 产品定位
 
-现有信息都藏在 terminal 里，用户需要频繁切回查看。这会打断注意力，也让后台运行的 agent 不够可靠。
+Agent Island 不是通用 dashboard，也不是 terminal 替代品。它是一个常驻的「agent 注意力岛」：当开发者把 Claude Code、Codex CLI、Gemini CLI 或类似工具交给后台工作后，小岛负责让 agent 的状态、阻塞点和关键选择浮出水面。
 
-Agent Island 的目标是把这些状态从主屏幕中“拿出来”，变成一个常驻桌面状态设备。
+产品应该让 AI coding agent 像一个可被观察的桌面协作者：
 
-参考产品：
+- 工作中可见
+- 健康时安静
+- 卡住时明确叫你
+- 要权限时足够安全
+- 需要深上下文时回到 terminal
 
-- [CodeIsland](https://github.com/wxtsky/CodeIsland)
-- [AgentGlance](https://github.com/hezi/AgentGlance)
-- [CodexIsland](https://github.com/ericjypark/codex-island)
+第一阶段真实接入以 Claude Code 为主，因为 Claude Code hooks 能暴露生命周期、工具调用、权限、问题、通知等事件。Codex CLI 和 Gemini CLI 作为长期兼容方向，但 v0.2-v0.4 的产品验证以 Claude Code 为准。
+
+## 用户问题
+
+开发者使用 CLI agent 时，经常启动任务后切回其他窗口工作。agent 可能在后台：
+
+- 等待权限确认
+- 问一个选择题，例如某个 skill 给出 `1 / 2 / 3` 三个方向
+- 等待自由文本输入
+- 要求审阅计划
+- 执行命令或测试失败
+- 完成后安静停住
+- 消耗 token 超出预期
+
+这些信息通常都藏在 terminal 中。用户只能不断切回去看 agent 是在工作、卡住、失败，还是已经完成。Agent Island 要减少这种注意力浪费。
 
 ## 目标用户
 
-第一阶段只服务一类人：
+第一批用户是高频使用 AI coding agent 的 macOS 开发者。
 
-使用 CLI AI coding agent 的开发者和 AI-heavy builder。
+典型特征：
 
-典型用户特征：
+- 每天使用 Claude Code、Codex CLI、Gemini CLI、OpenCode 或类似工具
+- 经常让 agent 跑较长的开发任务
+- 不想频繁检查 terminal
+- 希望明确看到权限、问题、失败和完成状态
+- 愿意把平板、小屏幕、HDMI 副屏或浏览器窗口作为辅助显示
+- 更信任本地优先工具，不希望 transcript 默认上传云端
 
-- 经常使用 Codex CLI、Claude Code、Gemini CLI 或类似工具
-- 一天内会跑多个开发任务
-- 不想一直盯 terminal
-- 关心 token、cost、额度和任务状态
-- 愿意用平板或小屏幕做桌面辅助屏
+## 核心 Jobs
 
-## 核心用户问题
+1. 当我把 agent 放到后台运行时，我想知道它是不是还在工作，这样不用反复切回 terminal。
+2. 当 agent 需要我介入时，我想知道它到底需要权限、回答、计划审阅、还是失败处理。
+3. 当出现权限请求时，我想看到和 Claude Code terminal 中语义一致的 `Yes / Always / No`。
+4. 当 agent 问选择题时，我想看到真实选项，而不是被误判成权限请求。
+5. 当 agent 失败或完成时，我想看到简洁摘要，并能快速回到对应 terminal。
+6. 当 token 或 cost 明显升高时，我想看到轻量提示，但不希望主界面变成账单页。
 
-Agent Island 要回答：
+## 真实测试后的关键学习
 
-1. Agent 现在是不是还在工作？
-2. 它正在做什么？
-3. 它是不是在等我确认或回答？
-4. 它成功了还是失败了？
-5. 这次任务大概烧了多少 token？
-6. 今天总共花了多少钱？
+早期 demo 把所有阻塞状态都压成「等待确认」。真实 Claude Code 环境更复杂：
 
-## 产品形态
+- 工具权限可能显示 `Yes`、`Always`、`No`。
+- 有些 terminal 中可见的授权提示只会经过 `PreToolUse` 和 `Notification`，不一定总有完整 `PermissionRequest`。
+- `AskUserQuestion` 不是权限请求。它可能包含多个问题、选项、多选、自由输入和 Other。
+- Plan review、skill 方向选择、权限确认、idle 输入、命令失败，都应该是不同卡片。
+- 通用通知，例如 `Claude needs your permission`，可能晚于更详细的工具事件到达，不能覆盖已经可操作的卡片。
 
-MVP 阶段不做定制硬件。
+产品结论：Agent Island 需要一个「交互模型」，而不只是一个 `waiting_approval` 状态。
+
+## 产品原则
+
+- 当前状态优先于日志。用户几秒内要知道 agent 在干什么。
+- 介入必须分类型。权限、问题、计划、失败、完成不是同一种交互。
+- fail open。Agent Island 离线时，Claude Code 应回退到原生 terminal 行为。
+- 不静默批准。小岛只能传递用户明确选择，不能替用户自动 approve。
+- terminal 仍是权威上下文。小岛帮助介入，但不抢 terminal 的职责。
+- 本地优先。server、hooks、WebSocket、短期状态默认留在用户本机。
+- 用量估算必须标记 `estimated`。不对无法保证的数据承诺精确。
+- 先做好单一主 agent。多 session 有价值，但不能让早期产品变回密集 dashboard。
+
+## 产品体验形态
 
 ```text
-Mac 本地服务
-+ Terminal Agent Wrapper
-+ 小米平板浏览器或 HDMI 小副屏
-+ WebSocket 实时状态同步
+Claude Code / CLI agent
+  -> hook 或 wrapper 事件
+  -> 本地 Agent Island server
+  -> 标准化 session + interaction queues
+  -> WebSocket snapshot
+  -> 平板 / 浏览器小岛 UI
+  -> 用户显式选择（可选）
+  -> hook response 回传给 agent
 ```
 
-用户使用方式：
+主界面仍然是一个强主次关系的单一状态岛：
 
-```text
-Mac 上运行 island server
-小米平板打开 Agent Island 页面
-用 island run codex 启动 agent
-平板显示 Agent Island
-需要介入时再跳回 terminal
-```
-
-## MVP 功能范围
-
-第一版只做三个模块。
-
-### 模块 A：常驻状态岛
-
-状态岛是主界面。它应该能在副屏上一眼看懂。
-
-状态包括：
-
-- `idle`：空闲，没有活跃 agent session
-- `starting`：agent 启动中
-- `thinking`：agent 正在思考或规划
-- `reading`：agent 正在读取文件或上下文
-- `editing`：agent 正在修改文件
-- `running_command`：agent 正在执行命令
-- `waiting_approval`：agent 正在等待权限确认
-- `waiting_input`：agent 正在等待用户回答
-- `completed`：任务完成
-- `failed`：任务失败或异常退出
-
-显示字段：
-
-- Agent 名称，例如 Codex、Claude、Gemini
-- 当前项目名
+- agent 与项目
 - 当前状态
 - 已运行时间
+- 当前工具或阶段
 - 最近动作
-- 最后一条摘要
-- 小角色或动画状态
+- 最后摘要
+- token / cost 估算
+- 需要注意时显示一个主介入卡片
+- event tail 只作为辅助诊断信息
+
+## 核心状态模型
+
+`IslandSnapshot` 可以继续作为前端渲染快照，但 server 内部应该逐步改为更精确的队列模型。
+
+建议模型：
+
+- `SessionState`：当前 agent 生命周期、展示摘要、项目、模型、用量。
+- `PermissionQueue`：可以 `allow`、`always`、`deny` 的权限请求。
+- `QuestionQueue`：来自 `AskUserQuestion`、`Elicitation` 或类似协议的结构化问题。
+- `PlanQueue`：计划审阅、方向选择、`ExitPlanMode` 等。
+- `AttentionQueue`：terminal-only 的失败、完成、idle prompt、异常用量。
+- `EventLog`：最近原始/标准化事件，用于解释为什么卡片出现或没有出现。
+
+前端可以一次只渲染一个主介入卡片，但数据层不要把所有事情都折叠成 `waiting_approval`。
+
+## 介入卡片类型
+
+### 权限卡片
+
+用于 agent 请求运行命令、读取文件、写入文件、联网、编辑或调用需要授权的工具。
+
+操作：
+
+- `Yes`：只允许本次请求。
+- `Always`：仅当 Claude Code 提供安全的 session-scoped permission update 时，允许当前 session 内匹配规则。
+- `No`：拒绝本次请求。
+- `Jump Back`：回到 terminal 查看完整上下文。
+
+要求：
+
+- 展示工具名和目标预览。
+- Bash 展示命令，Read 展示文件路径，Edit/Write 展示文件或 diff 摘要。
+- 没有可靠 session 权限规则时，不显示 `Always`。
+- 如果小岛无法安全回传决策，显示 `Jump Back`，不要编造按钮。
+
+### 问题卡片
+
+用于 agent 提出选择题或输入题，例如 skill 给出 `1 / 2 / 3` 三个方向。
+
+操作：
+
+- 渲染 payload 中的选项
+- 单选选项可在小岛上点击并回传（当前覆盖 `AskUserQuestion`、`ExitPlanMode` 批准类选择，以及 idle prompt 文本里的 `1 / 2 / 3`、`A / B / C` 选择）
+- 支持自由输入（后续协议闭环）
+- 支持多选（后续协议闭环）
+- `Jump Back`
+- 非阻塞通知可 `Dismiss`
+
+要求：
+
+- 不能叫「权限确认」。
+- 保留原始问题文案和选项。
+- 只有当 integration 能满足协议时，才从小岛回传结构化答案。
+- 不能把计划审阅或文字反馈伪装成普通 `1 / 2 / 3` 回答。
+
+### 计划审阅卡片
+
+用于 agent 请求离开计划模式、批准计划、选择执行方向或要求用户确认下一步。
+
+操作：
+
+- approve plan
+- request changes / provide feedback（如果协议支持）
+- `Jump Back`
+
+早期可以实现为特殊的问题卡片，但产品语义上应独立。
+
+### 失败卡片
+
+用于工具、命令或测试失败。
+
+操作：
+
+- `Jump Back`
+- `Dismiss`
+- `Mark Done`
+
+要求：
+
+- 展示失败工具/命令和简短错误预览。
+- 早期不做自动修复。
+
+### 完成卡片
+
+用于 agent 完成 turn 或 session。
+
+操作：
+
+- `Jump Back`
+- `Dismiss`
+- `Mark Done`
+
+要求：
+
+- 展示完成摘要和本次用量估算。
+- 对很小、无动作价值的完成 turn 避免频繁打扰。
+
+## MVP 模块
+
+### 模块 A：状态岛
+
+状态：
+
+- `idle`
+- `starting`
+- `thinking`
+- `reading`
+- `editing`
+- `running_command`
+- `waiting_approval`
+- `waiting_input`
+- `completed`
+- `failed`
+
+展示字段：
+
+- agent 名称
+- 项目
+- session title 或首条 prompt 摘要
+- 当前状态
+- 已运行时间
+- 当前工具
+- 最近动作
+- 最后摘要
+- compact event tail
+- token / cost 估算
 
 设计约束：
 
-- 状态岛应该有生命感，但不能吵。
-- 当前状态优先级高于长日志。
-- 优先适配横屏平板。
-- 避免变成密集 dashboard。
+- 横屏平板优先，桌面浏览器可用。
+- 首屏必须一眼看出当前 agent 状态。
+- 日志只能是辅助信息。
+- 单 session 价值验证前，不做多面板 dashboard。
 
-### 模块 B：介入卡片
+### 模块 B：本地实时 server
 
-当 agent 需要用户注意时，状态岛展开为介入卡片。
+职责：
 
-MVP 提醒场景：
+- 托管浏览器 UI
+- 接收 agent 事件
+- 标准化事件为 snapshot
+- 通过 WebSocket 推送状态
+- 提供当前 snapshot 供 polling / debug
+- 在内存中维护短生命周期交互队列
+- server 不可用时让 agent 回退原生行为
 
-- agent 等待权限确认
-- agent 等待用户输入
-- 命令执行失败
-- 测试失败
-- 任务完成
+现有 `/events` 和 `/permissions` 可以继续演进，但产品层应抽象成 interaction API。
 
-MVP 操作：
+### 模块 C：Claude Code hook bridge
 
-- `Jump Back`：跳回对应 terminal
-- `Dismiss`：忽略提醒
-- `Mark Done`：标记已处理
+职责：
 
-MVP 不做：
+- 安全安装项目级或用户级 hooks
+- 从 stdin 读取 hook JSON
+- 映射 hook event 到 Agent Island event
+- 只在合适场景等待用户显式决策
+- 输出合法 Claude Code hook response
+- 小岛不可用时保持 Claude Code 原生 terminal 行为
 
-- 从平板 approve 或 deny 命令
-- 从平板 quick reply 给 agent
-- 替代 terminal 交互
+关键 hook 区分：
 
-### 模块 C：Token / Cost 面板
+- `PreToolUse`：每次匹配工具调用前触发，可以返回 `permissionDecision`。
+- `PermissionRequest`：Claude Code 即将展示权限对话框时触发。
+- `Notification`：可能表示等待输入或权限，但细节可能不足。
+- `AskUserQuestion` / `Elicitation`：需要结构化回答，不是 approve/deny。
+- `ExitPlanMode`：计划审阅语义，应避免混进普通工具权限。
 
-用量需要可见，但它是辅助信息，不是主界面中心。
+当前 `island claude` 安装的 Claude hook 默认启用 `ISLAND_PRETOOL_PERMISSION_MODE=gate`，用于把真实权限和结构化选择提前接入 AgentDock。通用 `Notification` 仍不可直接决策；只有服务端生成 `permissionId` 或 `questionId` 后，UI 才显示可执行按钮。
+
+### 模块 D：Token / Cost
 
 MVP 字段：
 
-- 当前 session 估算 token
-- 今日估算 token
-- 今日 cost
-- 当前模型，如果能识别
-- 是否异常消耗
+- 当前 session token 估算
+- 今日 token 估算
+- 估算 cost
+- 当前模型（如果能识别）
+- 高消耗提示
 
 规则：
 
-- 如果用量来自输出推断，而不是 provider API，必须标记为 `estimated`。
-- 如果 CLI 不暴露精确数据，不承诺精确 cost。
-- Provider Usage / Costs API 可以在状态岛可用后再接入。
+- 早期可以解析 Claude Code JSONL transcript。
+- provider API 后续再接。
+- 任何推断值都必须标记 `estimated`。
 
-## 核心用户流程
+## 竞品与启发
 
-```text
-用户启动 island server
--> 小米平板打开 Agent Island 页面
--> 用户运行 island run codex
--> 小岛显示 Codex 正在工作
--> Codex 执行命令 / 修改文件 / 等待确认
--> 小岛更新状态
--> 需要用户时弹出介入卡片
--> 用户点击 Jump Back 回到 terminal
--> 任务完成
--> 小岛显示完成摘要和本次用量
-```
+这个方向的竞品正在从「终端文本观察」转向「hook-based agent control」。
+
+- CodeIsland：macOS notch-native，支持 agent 状态、权限、问题、session jump、多 agent。
+- AgentGlance：macOS overlay，明确强调 approve tools、answer questions、review plans。
+- cctop：macOS menu bar/control-center 模式，重点是多 session 追踪和跳回精确 terminal/editor。
+- tmux-agent-sidebar / tmux-agent-status：terminal-native sidebar，证明 hook 状态比纯进程轮询更可靠。
+- Open Island：开源 macOS island，包含 hook bridge、session discovery、本地存储、用量、权限/问题流和多 terminal jump。
+
+Agent Island 的差异化：
+
+- 浏览器 / 平板 / 小副屏优先，而不是 notch-only 或 tmux-only。
+- v0.1-v0.4 聚焦单一主 session 的高可读性。
+- 用 Node + React 快速验证，再考虑 native app。
+- 产品核心是「识别正确介入类型」，不是平铺所有 session。
 
 ## 不做范围
 
-MVP 暂时不做：
+早期不做：
 
-- 定制硬件
-- Apple Watch App
-- 多设备同步
+- 云同步
+- hosted accounts
+- 通用项目管理
+- 完整 agent 编排
+- 自动 approve 命令
+- remote terminal 替代品
+- 复杂历史分析
+- 多 agent 调度
 - 插件市场
-- 复杂主题系统
-- 真正替用户 approve / deny
-- 从平板 quick reply
-- 多 agent 编排
-- 完整历史分析
-- 精确计费承诺
+- 依赖特定硬件
 
-## 技术方案
+## 成功标准
 
-### 前端
+Demo 成功：
 
-- React 或 Next.js
-- 横屏平板优先
-- v0.1 可以使用固定 demo 尺寸
-- 通过 WebSocket 接收实时状态
-- 增加 session 列表前，先围绕一个主 agent session 设计
+- 旁观者 5 秒内能说出 agent 正在做什么。
+- 等待、失败、完成有明显差异。
+- UI 不像通用 dashboard。
 
-### 后端
+真实 Claude Code 成功：
 
-- Node.js 本地服务
-- WebSocket 推送状态
-- MVP 使用本地内存存储
-- v0.1-v0.2 不需要数据库
+- 原生权限提示能在小岛上显示正确 `Yes / Always / No`（协议支持时）。
+- 非权限选择题能显示为问题卡片，且保留真实选项。
+- Agent Island 离线时，Claude Code 回退 terminal 原生提示。
+- 通用通知不会覆盖详细可操作卡片。
+- 至少 3 个真实用户连续使用 3 天，并认为它减少了 terminal 检查。
 
-### Agent 接入
+用量成功：
 
-Agent Island 通过 wrapper 包装现有 CLI：
+- token / cost 作为方向性信号有帮助。
+- 估算值明确标记。
+- 高消耗能被注意到，但不把主界面变成账单 dashboard。
 
-```bash
-island run <command>
-```
+## 资料链接
 
-wrapper 监听：
-
-- `stdout`
-- `stderr`
-- 进程生命周期
-- exit code
-- 可识别的输出模式
-
-wrapper 把观察到的信息转换为标准事件。
-
-事件格式示例：
-
-```json
-{
-  "agent": "codex",
-  "project": "agent-island-demo",
-  "state": "running_command",
-  "message": "Running npm test",
-  "timestamp": 1760000000000
-}
-```
-
-初始事件状态应该少而可靠。只有当 wrapper 能稳定识别时，才增加更细颗粒度的状态。
-
-## 成功指标
-
-Demo 成功标准：
-
-- 用户能在平板或副屏上实时看到 agent 状态变化
-- 用户不需要频繁切回 terminal 确认 agent 是否还在工作
-- 等待确认、失败、完成时能被明显提醒
-- 至少 3 个真实使用者愿意连续使用 3 天
-- 用户能说清楚“这个东西帮我少看 terminal”
-
-## 产品判断
-
-这个产品第一阶段卖点不是“副屏”。
-
-真正的核心是让 AI agent 变成一个可被观察、可被管理、会在需要时叫你的桌面工作对象。硬件只是承载，状态采集、介入提醒和用量可视化才是产品核心。
+- Claude Code hooks reference: https://code.claude.com/docs/en/hooks
+- Claude Code hooks guide: https://code.claude.com/docs/en/hooks-guide
+- CodeIsland: https://github.com/wxtsky/CodeIsland
+- AgentGlance: https://agentglance.app/
+- cctop: https://cctop.app/
+- tmux-agent-sidebar: https://github.com/hiroppy/tmux-agent-sidebar
+- tmux-agent-status: https://github.com/samleeney/tmux-agent-status
+- Open Island: https://github.com/Octane0411/open-vibe-island

@@ -44,6 +44,18 @@ describe("islandDemo", () => {
     );
   });
 
+  it("includes a long-form numbered question scenario for agent direction choices", () => {
+    const questionScenario = islandScenarios.find(
+      (scenario) => scenario.intervention?.kind === "waiting_input"
+    );
+
+    expect(questionScenario?.intervention?.options).toEqual([
+      "1. 先澄清需求边界，写一份产品规格，再进入实现计划",
+      "2. 直接实现最小可用版本，但保留后续协议回传扩展点",
+      "3. 暂停实现，先做 Case 1 / Case 2 的视觉方案对比"
+    ]);
+  });
+
   it("formats elapsed time", () => {
     expect(formatElapsed(0)).toBe("—");
     expect(formatElapsed(45000)).toBe("45s");

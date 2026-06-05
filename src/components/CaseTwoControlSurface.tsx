@@ -8,7 +8,7 @@ import {
   ShieldAlert,
   Terminal
 } from "lucide-react";
-import { formatCurrentTool, formatTokens, stateLabels } from "../lib/agentDemo";
+import { formatCurrentTool, formatTokens, stateLabels, stateTone } from "../lib/agentDemo";
 import type { AgentViewProps } from "./types";
 import { BeaverLogo } from "./BeaverLogo";
 import { Metric } from "./Metric";
@@ -20,19 +20,6 @@ import {
   shouldShowInterventionActions,
   typedInteractionLabel
 } from "./interventionUtils";
-
-const stateTone: Record<string, string> = {
-  idle: "tone-idle",
-  starting: "tone-working",
-  thinking: "tone-working",
-  reading: "tone-working",
-  editing: "tone-working",
-  running_command: "tone-working",
-  waiting_approval: "tone-waiting",
-  waiting_input: "tone-waiting",
-  completed: "tone-done",
-  failed: "tone-failed"
-};
 
 const interventionIcon: Record<string, typeof ShieldAlert> = {
   waiting_approval: ShieldAlert,

@@ -4,26 +4,13 @@ import {
   MessageCircleQuestion,
   ShieldAlert
 } from "lucide-react";
-import { stateLabels } from "../lib/agentDemo";
+import { stateLabels, stateTone } from "../lib/agentDemo";
 import type { AgentViewProps } from "./types";
 import { BeaverLogo } from "./BeaverLogo";
 import { TopControls } from "./TopControls";
 import { MetricsFooter } from "./MetricsFooter";
 import { QuestionOptionActions } from "./QuestionActions";
 import { PermissionOrJumpActions } from "./PermissionActions";
-
-const stateTone: Record<string, string> = {
-  idle: "tone-idle",
-  starting: "tone-working",
-  thinking: "tone-working",
-  reading: "tone-working",
-  editing: "tone-working",
-  running_command: "tone-working",
-  waiting_approval: "tone-waiting",
-  waiting_input: "tone-waiting",
-  completed: "tone-done",
-  failed: "tone-failed"
-};
 
 const interventionIcon: Record<string, typeof ShieldAlert> = {
   waiting_approval: ShieldAlert,

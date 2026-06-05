@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AgentSnapshot } from "../types";
 import {
   isAgentSnapshot,
@@ -12,6 +12,8 @@ export function useAgentLive() {
   const [snapshot, setSnapshot] = useState<AgentSnapshot | null>(null);
   const [connectionState, setConnectionState] =
     useState<LiveConnectionState>("connecting");
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectDelay = useRef(1000); // exponential backoff, starts at 1s
 
   const applySnapshot = useCallback((value: unknown) => {
     if (isAgentSnapshot(value)) {
@@ -34,35 +36,66 @@ export function useAgentLive() {
   }, [applySnapshot]);
 
   useEffect(() => {
-    void pullSnapshot();
+    let socket: WebSocket | null = null;
+    let poll: ReturnType<typeof setInterval> | null = null;
+    let stopped = false;
 
-    const wsUrl =
-      import.meta.env.VITE_AGENTCARD_WS_URL ??
-      import.meta.env.VITE_ISLAND_WS_URL ??
-      resolveAgentCardWsUrl(window.location.href);
-    const socket = new WebSocket(wsUrl);
+    function connect() {
+      if (stopped) return;
 
-    socket.addEventListener("open", () => {
-      setConnectionState("connected");
-      void pullSnapshot();
-    });
-    socket.addEventListener("close", () => setConnectionState("offline"));
-    socket.addEventListener("error", () => setConnectionState("offline"));
-    socket.addEventListener("message", (event) => {
-      try {
-        applySnapshot(JSON.parse(event.data));
-      } catch {
+      const wsUrl =
+        import.meta.env.VITE_AGENTCARD_WS_URL ??
+        import.meta.env.VITE_ISLAND_WS_URL ??
+        resolveAgentCardWsUrl(window.location.href);
+
+      setConnectionState("connecting");
+      socket = new WebSocket(wsUrl);
+
+      socket.addEventListener("open", () => {
+        reconnectDelay.current = 1000;
+        setConnectionState("connected");
+        void pullSnapshot();
+      });
+
+      socket.addEventListener("close", () => {
         setConnectionState("offline");
-      }
-    });
+        scheduleReconnect();
+      });
 
-    const poll = window.setInterval(() => {
+      socket.addEventListener("error", () => {
+        setConnectionState("offline");
+        scheduleReconnect();
+      });
+
+      socket.addEventListener("message", (event) => {
+        try {
+          applySnapshot(JSON.parse(event.data));
+        } catch {
+          setConnectionState("offline");
+        }
+      });
+    }
+
+    function scheduleReconnect() {
+      if (stopped) return;
+      reconnectTimer.current = setTimeout(() => {
+        reconnectDelay.current = Math.min(reconnectDelay.current * 2, 30_000);
+        connect();
+      }, reconnectDelay.current);
+    }
+
+    void pullSnapshot();
+    connect();
+
+    poll = window.setInterval(() => {
       void pullSnapshot();
     }, 4000);
 
     return () => {
-      window.clearInterval(poll);
-      socket.close();
+      stopped = true;
+      if (poll !== null) window.clearInterval(poll);
+      if (reconnectTimer.current !== null) clearTimeout(reconnectTimer.current);
+      if (socket) socket.close();
     };
   }, [applySnapshot, pullSnapshot]);
 

@@ -4,10 +4,8 @@ export function parseCliArgs(argv, env = process.env) {
   const [mode, ...rest] = argv;
 
   if (mode === "server") {
-    return {
-      mode: "server",
-      port: readPort(rest, env.AGENTCARD_PORT)
-    };
+    const { host, port } = readServerOptions(rest, env.AGENTCARD_HOST, env.AGENTCARD_PORT);
+    return { mode: "server", host, port };
   }
 
   if (mode === "run") {
@@ -44,6 +42,21 @@ export function parseCliArgs(argv, env = process.env) {
   return { mode: "help" };
 }
 
+function readServerOptions(args, envHost, envPort) {
+  const hostFlagIndex = args.indexOf("--host");
+
+  const hostRaw = hostFlagIndex >= 0 ? args[hostFlagIndex + 1] : envHost;
+  const host = hostRaw && !hostRaw.startsWith("--") ? hostRaw : "127.0.0.1";
+
+  const remainingArgs =
+    hostFlagIndex >= 0
+      ? args.filter((_a, i) => i !== hostFlagIndex && i !== hostFlagIndex + 1)
+      : args;
+  const port = readPort(remainingArgs, envPort);
+
+  return { host, port };
+}
+
 function readPort(args, envPort) {
   const portFlagIndex = args.indexOf("--port");
   const value = portFlagIndex >= 0 ? args[portFlagIndex + 1] : envPort;
@@ -78,7 +91,7 @@ function parseRunArgs(args, envServerUrl) {
 export function usage() {
   return [
     "Usage:",
-    "  agentcard server [--port 4317]",
+    "  agentcard server [--port 4317] [--host 127.0.0.1]",
     "  agentcard claude [--server http://127.0.0.1:4317] [...claude args]",
     "  agentcard run [--server http://127.0.0.1:4317] <command> [...args]",
     "  agentcard setup claude [--global]",

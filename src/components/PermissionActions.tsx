@@ -105,6 +105,9 @@ export function PermissionDecisionButtons({
   canDecideOnTablet: boolean;
   decidePermission: AgentViewProps["decidePermission"];
 }) {
+  if (!intervention || !intervention.permissionId) return null;
+  const { permissionId } = intervention;
+
   return (
     <>
       {permissionDecisionsForIntervention(intervention, canDecideOnTablet).map(
@@ -113,7 +116,7 @@ export function PermissionDecisionButtons({
             type="button"
             className={permissionDecisionClassName(decision)}
             key={decision}
-            onClick={() => decidePermission(intervention!.permissionId!, decision)}
+            onClick={() => decidePermission(permissionId, decision)}
           >
             {decision === "always" ? (
               <ShieldAlert size={18} />

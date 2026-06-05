@@ -38,17 +38,25 @@ npm run agentcard -- server
 npm run agentcard -- run codex
 ```
 
-然后在平板或副屏打开：
-
-```text
-http://<mac-lan-ip>:<port>
-```
-
-本地开发阶段默认端口是 `4317`，页面地址通常是：
+本地开发阶段默认端口是 `4317`，绑定 `127.0.0.1`（仅本机可访问）：
 
 ```text
 http://127.0.0.1:4317
 ```
+
+如需在平板或副屏访问，启动时加上 `--host 0.0.0.0`：
+
+```bash
+npm run agentcard -- server --host 0.0.0.0
+```
+
+然后在平板浏览器打开：
+
+```text
+http://<mac-lan-ip>:4317
+```
+
+> **安全提示：** `--host 0.0.0.0` 会暴露服务到整个局域网。仅在信任的网络环境中使用（如家庭 WiFi），公共网络或办公网络下建议保持默认 `127.0.0.1`。详细安全模型见下方「本地优先」说明。
 
 `agentcard run <command>` 只监控由它启动的进程。它不会改写 shell alias，也不会影响你直接输入 `claude`、`codex` 或 `gemini` 的原始用法。
 

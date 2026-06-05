@@ -33,6 +33,19 @@ export function createSnapshotBroadcaster() {
       sockets.add(socket);
       socket.on("close", () => sockets.delete(socket));
       socket.on("error", () => sockets.delete(socket));
+      socket.on("data", (data) => {
+        if (data.length < 2) return;
+        const opcode = data.readUInt8(0) & 0x0f;
+        if (opcode === 0x09) {
+          // Ping → respond Pong
+          socket.write(encodeControlFrame(0x0a));
+        } else if (opcode === 0x08) {
+          // Close → ack and destroy
+          socket.write(encodeControlFrame(0x08));
+          socket.destroy();
+        }
+        // Ignore text frames (0x01), continuation (0x00), and unknown opcodes
+      });
       send(socket, snapshot);
     },
 
@@ -47,6 +60,11 @@ export function createSnapshotBroadcaster() {
 function send(socket, value) {
   if (socket.destroyed) return;
   socket.write(encodeFrame(JSON.stringify(value)));
+}
+
+function encodeControlFrame(opcode) {
+  // RFC 6455: control frames have FIN + opcode, zero-length payload
+  return Buffer.from([0x80 | opcode, 0x00]);
 }
 
 function encodeFrame(text) {

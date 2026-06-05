@@ -18,6 +18,19 @@ export const stateLabels: Record<AgentState, string> = {
   failed: "失败"
 };
 
+export const stateTone: Record<AgentState, string> = {
+  idle: "tone-idle",
+  starting: "tone-working",
+  thinking: "tone-working",
+  reading: "tone-working",
+  editing: "tone-working",
+  running_command: "tone-working",
+  waiting_approval: "tone-waiting",
+  waiting_input: "tone-waiting",
+  completed: "tone-done",
+  failed: "tone-failed"
+};
+
 export function formatTokens(count: number): string {
   if (count === 0) return "—";
   if (count >= 1000) {

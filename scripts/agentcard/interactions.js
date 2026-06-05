@@ -125,6 +125,18 @@ function upsert(queue, interaction) {
     queue[index] = interaction;
     return;
   }
+
+  // Only keep one active attention item; replace the oldest.
+  if (interaction.kind === "attention" && queue.length > 0) {
+    queue[queue.length - 1] = interaction;
+    return;
+  }
+
+  // Cap permissions and questions at a reasonable max.
+  if (interaction.kind !== "attention" && queue.length >= 20) {
+    queue.splice(0, queue.length - 19);
+  }
+
   queue.push(interaction);
 }
 

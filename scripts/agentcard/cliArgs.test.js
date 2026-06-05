@@ -29,6 +29,7 @@ describe("agentcard cli args", () => {
   it("parses server port overrides", () => {
     expect(parseCliArgs(["server", "--port", "4321"])).toEqual({
       mode: "server",
+      host: "127.0.0.1",
       port: 4321
     });
   });

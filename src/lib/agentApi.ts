@@ -63,7 +63,10 @@ export async function skipQuestion(
   href: string = window.location.href
 ): Promise<void> {
   const base = resolveAgentCardHttpUrl(href);
-  await fetch(`${base}/questions/${questionId}/skip`, {
+  const response = await fetch(`${base}/questions/${questionId}/skip`, {
     method: "POST"
   });
+  if (!response.ok) {
+    throw new Error(`Failed to skip question: ${response.status}`);
+  }
 }

@@ -9,7 +9,7 @@ async function main() {
   const parsed = parseCliArgs(process.argv.slice(2));
 
   if (parsed.mode === "server") {
-    await startAgentCardServer({ port: parsed.port });
+    await startAgentCardServer({ port: parsed.port, host: parsed.host });
     return;
   }
 

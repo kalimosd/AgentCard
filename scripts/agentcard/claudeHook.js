@@ -68,14 +68,6 @@ export async function routeClaudeHookPayload(
   return null;
 }
 
-async function postObservedEvent(payload, post) {
-  const event = mapClaudeHookToAgentCardEvent(payload);
-  if (event) {
-    await post("/events", event);
-  }
-  return null;
-}
-
 async function handlePermissionRequest(
   payload,
   { postJson: post = postJson } = {}
@@ -439,18 +431,25 @@ function permissionPayload(payload) {
 }
 
 async function postJson(pathname, body) {
-  const response = await fetch(new URL(pathname, serverUrl), {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const response = await fetch(new URL(pathname, serverUrl), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
 
-  if (!response.ok) {
-    throw new Error(`AgentCard server ${pathname} failed: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`AgentCard server ${pathname} failed: ${response.status}`);
+    }
+
+    if (response.status === 204) return null;
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (response.status === 204) return null;
-  return response.json();
 }
 
 async function readStdin() {

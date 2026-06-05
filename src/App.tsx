@@ -8,7 +8,8 @@ import {
   getElapsedMs,
   hasIntervention,
   isWorkingState,
-  quotaTone
+  quotaTone,
+  stateTone
 } from "./lib/agentDemo";
 import type {
   InterventionKind,
@@ -26,19 +27,6 @@ const interventionIcon: Record<InterventionKind, typeof ShieldAlert> = {
   command_failed: AlertTriangle,
   test_failed: AlertTriangle,
   completed: CheckCircle2
-};
-
-const stateTone: Record<AgentState, string> = {
-  idle: "tone-idle",
-  starting: "tone-working",
-  thinking: "tone-working",
-  reading: "tone-working",
-  editing: "tone-working",
-  running_command: "tone-working",
-  waiting_approval: "tone-waiting",
-  waiting_input: "tone-waiting",
-  completed: "tone-done",
-  failed: "tone-failed"
 };
 
 function App() {

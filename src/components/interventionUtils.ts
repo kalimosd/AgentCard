@@ -1,4 +1,5 @@
-import type { InterventionCard } from "../types";
+import type { AgentState, InterventionCard } from "../types";
+import { stateLabels } from "../lib/agentDemo";
 
 export function shouldShowInterventionActions(
   showIntervention: boolean,
@@ -12,26 +13,13 @@ export function displaySessionTitle({
   state
 }: {
   sessionTitle: string;
-  state: string;
+  state: AgentState;
 }) {
   if (sessionTitle === "未启动") {
     return stateLabels[state] ?? state;
   }
   return sessionTitle;
 }
-
-const stateLabels: Record<string, string> = {
-  idle: "待命",
-  starting: "启动中",
-  thinking: "思考中",
-  reading: "读取中",
-  editing: "编辑中",
-  running_command: "执行命令",
-  waiting_approval: "等待权限",
-  waiting_input: "等待输入",
-  completed: "已完成",
-  failed: "失败"
-};
 
 export function typedInteractionLabel(intervention?: InterventionCard) {
   if (!intervention) return "观察中";
@@ -85,12 +73,13 @@ export function questionAnswerLabelsForIntervention(
 
 export function isQuestionOptionAnswerable(
   intervention: InterventionCard,
-  option: string,
+  _option: string,
   index: number
 ) {
   if (intervention.interactionKind !== "plan") return true;
-  const text = option.toLowerCase();
-  return index < 2 && !text.includes("tell claude what to change");
+  // Plans: first 2 options are answerable from AgentCard;
+  // option 3+ (feedback) must go back to terminal.
+  return index < 2;
 }
 
 export function questionOptionParts(option: string, index: number) {

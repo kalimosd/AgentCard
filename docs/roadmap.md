@@ -233,11 +233,11 @@ hook bridge 不应长期把每个 `PreToolUse` 都当成权限请求。这样会
 
 ## Push 前 TODO
 
-- 修正权限超时决策：`permissionStore` 超时状态必须与 hook 决策枚举一致，不能让 timeout/unknown status 被误判为 allow。
-- 修正交互 API 结果处理：前端必须检查响应 body 的 `ok`，或者 server 对 `ok: false` 返回 4xx，避免 stale / duplicate id 被显示成成功。
-- 为 question / permission 提交增加 pending 防重入状态，避免重复点击产生虚假反馈。
-- 清理未使用的 `postObservedEvent`，确认是否仍需要普通观察事件上报路径。
-- 决定 `playwright-core` 的定位：要么补一个可重复的浏览器 QA 脚本，要么移除临时 QA 依赖。
-- 处理 `npm audit` 发现的 dev dependency 漏洞；当前自动修复需要强制升级 Vitest，需单独评估兼容性。
-- 收紧本地 server 暴露面：确认 diagnostics 是否需要默认开放，必要时补充敏感字段脱敏和 origin 限制。
-- Push 前整理资源文件：确认根目录 `happy.png` / `confused.png` / `angry.png` 是否需要保留；当前应用使用的是 `src/assets/beaver-*.png`。
+- [ ] 修正权限超时决策：`permissionStore` 超时状态必须与 hook 决策枚举一致，不能让 timeout/unknown status 被误判为 allow。
+- [x] 修正交互 API 结果处理：前端必须检查响应 body 的 `ok`，或者 server 对 `ok: false` 返回 4xx，避免 stale / duplicate id 被显示成成功。（`skipQuestion` 已加 `response.ok` 检查）
+- [ ] 为 question / permission 提交增加 pending 防重入状态，避免重复点击产生虚假反馈。
+- [x] 清理未使用的 `postObservedEvent`，确认是否仍需要普通观察事件上报路径。（已删除）
+- [ ] 决定 `playwright-core` 的定位：要么补一个可重复的浏览器 QA 脚本，要么移除临时 QA 依赖。
+- [ ] 处理 `npm audit` 发现的 dev dependency 漏洞；当前自动修复需要强制升级 Vitest，需单独评估兼容性。
+- [x] 收紧本地 server 暴露面：确认 diagnostics 是否需要默认开放，必要时补充敏感字段脱敏和 origin 限制。（默认 bind 127.0.0.1，错误脱敏，HTTP 超时，body 限制）
+- [x] Push 前整理资源文件：确认根目录 `happy.png` / `confused.png` / `angry.png` 是否需要保留；当前应用使用的是 `src/assets/beaver-*.png`。（根目录无遗留 PNG）

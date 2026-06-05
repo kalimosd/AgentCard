@@ -53,7 +53,8 @@ export function createAgentCardHttpServer({
         response.writeHead(204);
         response.end();
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        console.error("AgentCard /events:", error);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -83,7 +84,8 @@ export function createAgentCardHttpServer({
         broadcaster.broadcast(snapshot);
         sendJson(response, { id });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        console.error("AgentCard /permissions:", error);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -105,7 +107,8 @@ export function createAgentCardHttpServer({
         broadcaster.broadcast(snapshot);
         sendJson(response, { id });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        console.error("AgentCard /questions:", error);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -130,7 +133,7 @@ export function createAgentCardHttpServer({
         broadcaster.broadcast(snapshot);
         sendJson(response, result);
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -145,7 +148,7 @@ export function createAgentCardHttpServer({
         });
         sendJson(response, { ok });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -159,7 +162,7 @@ export function createAgentCardHttpServer({
         });
         sendJson(response, { ok });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -170,7 +173,7 @@ export function createAgentCardHttpServer({
         const ok = questionStore.skip(questionSkipMatch[1]);
         sendJson(response, { ok });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -195,7 +198,7 @@ export function createAgentCardHttpServer({
         broadcaster.broadcast(snapshot);
         sendJson(response, { status });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -207,7 +210,7 @@ export function createAgentCardHttpServer({
         const ok = permissionStore.decide(decisionMatch[1], body.decision);
         sendJson(response, { ok });
       } catch (error) {
-        sendJson(response, { error: error.message }, 400);
+        sendJson(response, { error: "Invalid request" }, 400);
       }
       return;
     }
@@ -289,14 +292,20 @@ function redactDiagnosticEntry(entry) {
   );
 }
 
-export async function startAgentCardServer({ port }) {
+export async function startAgentCardServer({ port, host = "127.0.0.1" }) {
   const server = createAgentCardHttpServer();
 
+  // Apply resource constraints before listening.
+  server.timeout = 30_000;
+  server.keepAliveTimeout = 5_000;
+  server.headersTimeout = 8_000;
+
   await new Promise((resolve) => {
-    server.listen(port, "0.0.0.0", resolve);
+    server.listen(port, host, resolve);
   });
 
-  console.log(`AgentCard server listening on http://127.0.0.1:${port}`);
+  const displayHost = host === "0.0.0.0" ? "127.0.0.1" : host;
+  console.log(`AgentCard server listening on http://${displayHost}:${port}`);
   return server;
 }
 
@@ -312,9 +321,13 @@ function sendJson(response, value, status = 200) {
 }
 
 async function readJson(request) {
+  const MAX_BODY_BYTES = 1_000_000; // 1 MB
   let body = "";
   for await (const chunk of request) {
     body += chunk;
+    if (Buffer.byteLength(body) > MAX_BODY_BYTES) {
+      throw new Error("Request body exceeds 1 MB limit");
+    }
   }
   return JSON.parse(body || "{}");
 }

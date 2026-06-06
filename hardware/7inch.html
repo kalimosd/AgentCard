@@ -1,0 +1,614 @@
+<!doctype html>
+<!-- Hardware profile: 7inch-1024x600 landscape touch prototype. See hardware/README.md. -->
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentCard · 7 寸触摸屏原型</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        width: 100vw; height: 100vh; overflow: hidden;
+        background: #0f1413; color: #e9efed;
+        font-family: "SF Pro Display", Inter, ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      :root {
+        --accent: #2dd4bf;
+        --ok: #34d399;
+        --wait: #fbbf24;
+        --fail: #f87171;
+        --idle: #64748b;
+        --tone: var(--idle);
+        --panel: rgba(255,255,255,0.055);
+        --line: rgba(255,255,255,0.1);
+        --muted: #93a39d;
+      }
+
+      body.tone-working { --tone: var(--accent); }
+      body.tone-waiting { --tone: var(--wait); }
+      body.tone-done { --tone: var(--ok); }
+      body.tone-failed { --tone: var(--fail); }
+
+      .screen {
+        width: 100vw; height: 100vh;
+        display: grid;
+        grid-template-rows: 66px minmax(0, 1fr) 68px;
+        gap: 14px;
+        padding: 18px 22px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 430px;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand {
+        min-width: 0;
+        display: flex; align-items: center; gap: 14px;
+      }
+
+      .status-dot {
+        width: 12px; height: 12px; border-radius: 50%;
+        background: var(--tone); box-shadow: 0 0 18px var(--tone);
+        flex: 0 0 auto;
+      }
+      body.tone-working .status-dot,
+      body.tone-waiting .status-dot { animation: pulse 1.4s ease-in-out infinite; }
+
+      .title-stack { min-width: 0; }
+      .kicker {
+        font-size: 12px; line-height: 16px; color: var(--tone);
+        font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase;
+      }
+      .task-title {
+        margin-top: 8px;
+        font-size: 24px; line-height: 30px; font-weight: 850;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .top-metrics {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+      }
+      .metric {
+        min-width: 0; height: 54px;
+        display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
+        padding: 0 12px; border-radius: 12px;
+        background: var(--panel); border: 1px solid var(--line);
+      }
+      .metric span:first-child {
+        font-size: 10px; line-height: 1.1; color: #7f9089;
+        font-weight: 800; text-transform: uppercase;
+      }
+      .metric span:last-child {
+        margin-top: 5px;
+        font-size: 16px; line-height: 1.05; font-weight: 850;
+      }
+
+      .main {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .companion {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: 262px minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .pet-stage {
+        position: relative; isolation: isolate; overflow: hidden;
+        border-radius: 22px;
+        background:
+          radial-gradient(circle at 50% 26%, rgba(255,255,255,0.12), transparent 36%),
+          linear-gradient(145deg, rgba(255,255,255,0.085), rgba(255,255,255,0.03));
+        border: 1px solid var(--line);
+        display: grid; place-items: center;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      }
+      .pet-stage::after {
+        content: "";
+        position: absolute; width: 52%; height: 22px; bottom: 26px; left: 24%;
+        border-radius: 999px; background: var(--tone); opacity: 0.18; filter: blur(14px);
+        z-index: -1;
+      }
+      .pet-stage img {
+        width: 226px; height: 226px; object-fit: contain; object-position: center;
+        filter: drop-shadow(0 18px 16px rgba(0,0,0,0.42));
+        transform-origin: 50% 78%;
+        animation: pet-idle 3.2s ease-in-out infinite;
+      }
+      body.scene-working .pet-stage img { animation-name: pet-work; animation-duration: 2.4s; }
+      body.scene-approval .pet-stage img,
+      body.scene-question .pet-stage img { animation-name: pet-wait; animation-duration: 1.8s; }
+      body.scene-failed .pet-stage img { animation-name: pet-alert; animation-duration: 0.42s; }
+      body.scene-done .pet-stage img { animation-name: pet-done; animation-duration: 2.2s; }
+
+      .summary {
+        min-height: 0;
+        border-radius: 18px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 16px;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 12px;
+      }
+      .summary h2 {
+        font-size: 13px; line-height: 1; color: var(--muted);
+        font-weight: 850; letter-spacing: 0.04em; text-transform: uppercase;
+      }
+      .steps {
+        display: grid; gap: 9px;
+        align-content: start;
+      }
+      .step {
+        display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px;
+        align-items: center; min-height: 36px;
+        color: #c8d3cf;
+      }
+      .step i {
+        width: 22px; height: 22px; border-radius: 50%;
+        display: grid; place-items: center;
+        font-style: normal; font-size: 11px; font-weight: 900;
+        background: rgba(255,255,255,0.08); color: var(--muted);
+      }
+      .step.active i { background: var(--tone); color: #06231f; }
+      .step span {
+        font-size: 14px; line-height: 1.25;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .work-area {
+        min-width: 0; min-height: 0;
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) 84px;
+        gap: 12px;
+      }
+
+      .action-panel {
+        min-height: 0;
+        border-radius: 22px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+        border: 1px solid color-mix(in srgb, var(--tone) 54%, rgba(255,255,255,0.08));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        padding: 18px;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 14px;
+        overflow: hidden;
+      }
+      @supports not (color: color-mix(in srgb, white, black)) {
+        .action-panel { border-color: var(--tone); }
+      }
+
+      .panel-head {
+        display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      }
+      .panel-title {
+        min-width: 0;
+        display: flex; align-items: center; gap: 12px;
+      }
+      .panel-icon {
+        width: 42px; height: 42px; border-radius: 12px;
+        display: grid; place-items: center; flex: 0 0 auto;
+        background: rgba(255,255,255,0.08); border: 1px solid var(--line);
+        color: var(--tone); font-size: 20px; font-weight: 900;
+      }
+      .panel-copy { min-width: 0; }
+      .panel-copy h1 {
+        font-size: 22px; line-height: 1.2; font-weight: 900;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .panel-copy p {
+        margin-top: 7px;
+        color: var(--muted); font-size: 14px; line-height: 1.25;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .pill {
+        height: 34px;
+        display: inline-flex; align-items: center;
+        padding: 0 12px; border-radius: 999px;
+        color: var(--tone); background: rgba(255,255,255,0.06); border: 1px solid var(--line);
+        font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: 0.04em;
+      }
+
+      .panel-body {
+        min-height: 0;
+        display: grid;
+      }
+
+      .quiet-grid {
+        display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px;
+      }
+      .status-note,
+      .cost-note {
+        min-width: 0;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.045);
+        border: 1px solid var(--line);
+        padding: 18px;
+      }
+      .status-note strong,
+      .cost-note strong {
+        display: block;
+        font-size: 15px; line-height: 1.15; color: var(--tone); margin-bottom: 10px;
+      }
+      .status-note p,
+      .cost-note p {
+        font-size: 18px; line-height: 1.3; font-weight: 750;
+      }
+
+      .choice-list {
+        display: grid; gap: 12px;
+        align-content: start;
+      }
+      .choice {
+        width: 100%; min-height: 54px;
+        display: grid; grid-template-columns: 36px minmax(0, 1fr) 32px; align-items: center; gap: 12px;
+        border-radius: 15px; border: 1px solid var(--line);
+        background: rgba(255,255,255,0.055);
+        color: inherit; font: inherit; text-align: left;
+        padding: 8px 12px;
+      }
+      .choice:hover,
+      .choice.selected {
+        border-color: var(--accent);
+        background: rgba(45,212,191,0.12);
+      }
+      .choice b {
+        width: 36px; height: 36px; display: grid; place-items: center;
+        border-radius: 10px; background: var(--accent); color: #06231f;
+        font-size: 15px; font-weight: 950;
+      }
+      .choice span {
+        min-width: 0;
+        font-size: 17px; line-height: 1.25; font-weight: 760;
+      }
+      .choice em {
+        font-style: normal; color: var(--muted); font-size: 20px; text-align: center;
+      }
+
+      .command-card {
+        align-self: start;
+        display: grid; gap: 14px;
+      }
+      .command-line {
+        min-height: 72px;
+        display: grid; grid-template-columns: 52px minmax(0, 1fr);
+        gap: 14px; align-items: center;
+        border-radius: 16px; border: 1px solid var(--line);
+        background: rgba(0,0,0,0.18); padding: 12px 14px;
+      }
+      .command-line code {
+        color: #e9efed; font-size: 18px; line-height: 1.2;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .command-line .panel-icon { width: 52px; height: 52px; }
+
+      .button-row {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+      }
+      .primary-btn,
+      .ghost-btn,
+      .danger-btn {
+        min-height: 54px; border-radius: 14px;
+        border: 1px solid var(--line);
+        font: inherit; font-size: 16px; font-weight: 900;
+        color: inherit; background: rgba(255,255,255,0.055);
+      }
+      .primary-btn { background: var(--accent); color: #06231f; border-color: transparent; }
+      .danger-btn { color: var(--fail); }
+
+      .terminal-preview {
+        border-radius: 18px;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--line);
+        padding: 14px 16px;
+        display: grid; grid-template-columns: 1fr auto; gap: 16px;
+        align-items: center;
+      }
+      .terminal-preview p {
+        min-width: 0;
+        color: #c8d3cf; font-size: 15px; line-height: 1.35;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .terminal-preview code {
+        color: var(--tone); font-size: 14px; font-weight: 850;
+      }
+
+      .scenario-switcher {
+        display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+      }
+      .scenario-switcher button {
+        min-height: 52px; border-radius: 15px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.06);
+        color: #cfd8d5; font: inherit; font-size: 15px; font-weight: 850;
+      }
+      .scenario-switcher button.active {
+        border-color: var(--tone); color: #ffffff;
+        box-shadow: inset 0 0 0 1px var(--tone);
+      }
+      body.hide-controls .scenario-switcher { display: none; }
+
+      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+      @keyframes pet-idle { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.015)} }
+      @keyframes pet-work { 0%,100%{transform:translateY(0) rotate(0deg) scale(1)} 45%{transform:translateY(-4px) rotate(-1.5deg) scale(1.018)} 72%{transform:translateY(1px) rotate(1deg) scale(0.997)} }
+      @keyframes pet-wait { 0%,100%{transform:translateY(0) rotate(-1.4deg) scale(1)} 50%{transform:translateY(-5px) rotate(2deg) scale(1.02)} }
+      @keyframes pet-alert { 0%,100%{transform:translateX(0) rotate(0deg) scale(1)} 25%{transform:translateX(-4px) rotate(-2.2deg) scale(1.01)} 75%{transform:translateX(4px) rotate(2.2deg) scale(1.01)} }
+      @keyframes pet-done { 0%,100%{transform:translateY(0) scale(1)} 18%{transform:translateY(-9px) scale(1.04)} 34%{transform:translateY(2px) scale(0.99)} 52%{transform:translateY(-4px) scale(1.015)} }
+
+      @media (max-width: 850px) {
+        .screen { padding: 14px; gap: 10px; grid-template-rows: 58px minmax(0, 1fr) 58px; }
+        .topbar { grid-template-columns: minmax(0, 1fr) 330px; }
+        .task-title { font-size: 20px; }
+        .top-metrics { grid-template-columns: repeat(2, 1fr); }
+        .metric { height: 25px; flex-direction: row; justify-content: space-between; }
+        .metric span:first-child { font-size: 9px; }
+        .metric span:last-child { margin-top: 0; font-size: 13px; }
+        .main { grid-template-columns: 286px minmax(0, 1fr); gap: 10px; }
+        .companion { grid-template-rows: 210px minmax(0, 1fr); gap: 10px; }
+        .pet-stage img { width: 184px; height: 184px; }
+        .work-area { grid-template-rows: minmax(0, 1fr) 72px; gap: 10px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .status-dot, .pet-stage img { animation: none !important; }
+      }
+    </style>
+  </head>
+  <body class="tone-working scene-working">
+    <main class="screen">
+      <header class="topbar">
+        <section class="brand">
+          <span class="status-dot"></span>
+          <div class="title-stack">
+            <div class="kicker" id="stateLabel">思考中 · CLAUDE</div>
+            <div class="task-title" id="taskTitle">正在重构 auth 模块的安全性</div>
+          </div>
+        </section>
+        <section class="top-metrics" id="metrics">
+          <div class="metric"><span>session</span><span>2.4k</span></div>
+          <div class="metric"><span>today</span><span>$0.42</span></div>
+          <div class="metric"><span>elapsed</span><span>08:12</span></div>
+          <div class="metric"><span>model</span><span>Claude</span></div>
+        </section>
+      </header>
+
+      <section class="main">
+        <aside class="companion">
+          <div class="pet-stage">
+            <img src="pet-happy.png" alt="河狸" id="petImg" />
+          </div>
+          <section class="summary">
+            <h2>Current Run</h2>
+            <div class="steps" id="steps"></div>
+          </section>
+        </aside>
+
+        <section class="work-area">
+          <section class="action-panel" id="actionPanel"></section>
+          <section class="terminal-preview">
+            <p id="terminalText">最近动作：正在分析 src/auth/session.ts 和测试覆盖范围</p>
+            <code id="terminalHint">127.0.0.1:4317</code>
+          </section>
+        </section>
+      </section>
+
+      <nav class="scenario-switcher" id="scenarioSwitcher">
+        <button data-scene="working" onclick="show('working')">工作中</button>
+        <button data-scene="approval" onclick="show('approval')">权限</button>
+        <button data-scene="question" onclick="show('question')">问题</button>
+        <button data-scene="failed" onclick="show('failed')">失败</button>
+        <button data-scene="done" onclick="show('done')">完成</button>
+      </nav>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const controlsHidden = params.has('clean') || params.has('capture');
+
+      const SCENES = {
+        working: {
+          tone: 'tone-working', state: '思考中', agent: 'CLAUDE',
+          title: '正在重构 auth 模块的安全性',
+          pet: 'happy',
+          metrics: ['2.4k', '$0.42', '08:12', 'Claude'],
+          terminal: '最近动作：正在分析 src/auth/session.ts 和测试覆盖范围',
+          steps: [
+            ['1', '读取 auth 模块和现有测试', true],
+            ['2', '提取 session 校验边界', true],
+            ['3', '准备补齐失败路径覆盖', false]
+          ],
+          panel: {
+            icon: '...',
+            title: 'Agent 正在工作',
+            detail: '无需介入。当前任务仍在运行，状态会自动更新。',
+            badge: 'live',
+            body: `<div class="quiet-grid">
+              <div class="status-note"><strong>Current action</strong><p>重构认证流程，同时保留已有 CLI 行为。</p></div>
+              <div class="cost-note"><strong>Run budget</strong><p>Token 使用正常，今日成本仍在轻量范围。</p></div>
+            </div>`
+          }
+        },
+        approval: {
+          tone: 'tone-waiting', state: '等待权限', agent: 'CLAUDE',
+          title: '请求执行 shell 命令',
+          pet: 'confused',
+          metrics: ['3.1k', '$0.48', '10:44', 'Claude'],
+          terminal: '权限请求：Bash 将运行 npm test',
+          steps: [
+            ['1', '修改 auth 边界处理', true],
+            ['2', '请求运行测试命令', true],
+            ['3', '等待用户授权继续', false]
+          ],
+          panel: {
+            icon: '!',
+            title: '权限确认',
+            detail: 'Claude 想运行一条本地命令。',
+            badge: 'needs you',
+            body: `<div class="command-card">
+              <div class="command-line"><div class="panel-icon">sh</div><code>npm test</code></div>
+              <div class="button-row">
+                <button class="primary-btn">Yes</button>
+                <button class="ghost-btn">Always</button>
+                <button class="danger-btn">No</button>
+              </div>
+            </div>`
+          }
+        },
+        question: {
+          tone: 'tone-waiting', state: '等待回答', agent: 'CLAUDE',
+          title: 'Codex 需要你在三个方向中选择',
+          pet: 'confused',
+          metrics: ['3.8k', '$0.55', '12:06', 'Codex'],
+          terminal: '问题：请选择下一步方向',
+          steps: [
+            ['1', '识别需求分支', true],
+            ['2', '整理三个可行方向', true],
+            ['3', '等待用户选择', false]
+          ],
+          panel: {
+            icon: '?',
+            title: '请选择下一步方向',
+            detail: '点击一个选项后，选择会回传到 agent 会话。',
+            badge: 'choice',
+            body: `<div class="choice-list">
+              <button class="choice" onclick="selectChoice(this)"><b>1</b><span>先澄清需求边界，写一份产品规格，再进入实现计划</span><em>›</em></button>
+              <button class="choice" onclick="selectChoice(this)"><b>2</b><span>直接实现最小可用版本，但保留后续协议回传扩展点</span><em>›</em></button>
+              <button class="choice" onclick="selectChoice(this)"><b>3</b><span>暂停实现，先做 Case 1 / Case 2 的视觉方案对比</span><em>›</em></button>
+            </div>`
+          }
+        },
+        failed: {
+          tone: 'tone-failed', state: '失败', agent: 'CLAUDE',
+          title: 'npm run lint · exit 127',
+          pet: 'angry',
+          metrics: ['6.2k', '$0.93', '18:21', 'Claude'],
+          terminal: '命令失败：Missing script: lint',
+          steps: [
+            ['1', '完成实现修改', true],
+            ['2', '尝试运行 lint', true],
+            ['3', '等待用户处理失败', false]
+          ],
+          panel: {
+            icon: 'x',
+            title: '命令失败',
+            detail: 'package.json 中没有 lint script。',
+            badge: 'blocked',
+            body: `<div class="command-card">
+              <div class="command-line"><div class="panel-icon">x</div><code>Missing script: lint</code></div>
+              <div class="button-row">
+                <button class="primary-btn">Open Terminal</button>
+                <button class="ghost-btn">Dismiss</button>
+                <button class="danger-btn">Stop</button>
+              </div>
+            </div>`
+          }
+        },
+        done: {
+          tone: 'tone-done', state: '已完成', agent: 'CLAUDE',
+          title: 'v0.1 demo 完成 · 18.4k tokens',
+          pet: 'happy',
+          metrics: ['18.4k', '$2.47', '32:08', 'Claude'],
+          terminal: '任务完成：实现、截图和验证已结束',
+          steps: [
+            ['1', '实现 UI 原型', true],
+            ['2', '验证五个状态', true],
+            ['3', '等待用户查看结果', true]
+          ],
+          panel: {
+            icon: '✓',
+            title: '任务完成',
+            detail: 'Agent 已完成当前 demo，并记录了用量摘要。',
+            badge: 'done',
+            body: `<div class="quiet-grid">
+              <div class="status-note"><strong>Summary</strong><p>五个状态均已渲染，触控操作区保持可用。</p></div>
+              <div class="cost-note"><strong>Session cost</strong><p>18.4k tokens · 估算 $2.47。</p></div>
+            </div>`
+          }
+        }
+      };
+
+      function renderMetrics(values) {
+        const labels = ['session', 'today', 'elapsed', 'model'];
+        document.getElementById('metrics').innerHTML = values.map((value, index) =>
+          `<div class="metric"><span>${labels[index]}</span><span>${value}</span></div>`
+        ).join('');
+      }
+
+      function renderSteps(steps) {
+        document.getElementById('steps').innerHTML = steps.map(([idx, label, active]) =>
+          `<div class="step${active ? ' active' : ''}"><i>${idx}</i><span>${label}</span></div>`
+        ).join('');
+      }
+
+      function renderPanel(panel) {
+        document.getElementById('actionPanel').innerHTML = `
+          <div class="panel-head">
+            <div class="panel-title">
+              <div class="panel-icon">${panel.icon}</div>
+              <div class="panel-copy">
+                <h1>${panel.title}</h1>
+                <p>${panel.detail}</p>
+              </div>
+            </div>
+            <span class="pill">${panel.badge}</span>
+          </div>
+          <div class="panel-body">${panel.body}</div>
+        `;
+      }
+
+      function show(name) {
+        const scene = SCENES[name];
+        document.body.className = `${scene.tone} scene-${name}${controlsHidden ? ' hide-controls' : ''}`;
+        document.getElementById('stateLabel').textContent = `${scene.state} · ${scene.agent}`;
+        document.getElementById('taskTitle').textContent = scene.title;
+        document.getElementById('terminalText').textContent = scene.terminal;
+        document.getElementById('petImg').src = `pet-${scene.pet}.png`;
+        renderMetrics(scene.metrics);
+        renderSteps(scene.steps);
+        renderPanel(scene.panel);
+        document.querySelectorAll('.scenario-switcher button').forEach((button) => {
+          button.classList.toggle('active', button.dataset.scene === name);
+        });
+      }
+
+      function selectChoice(el) {
+        el.parentElement.querySelectorAll('.choice').forEach((choice) => choice.classList.remove('selected'));
+        el.classList.add('selected');
+        el.querySelector('em').textContent = '✓';
+      }
+
+      const initial = [...params.keys()].find((key) => SCENES[key]) || 'working';
+      show(initial);
+
+      if (params.has('debug')) {
+        setTimeout(() => {
+          const selectors = ['.screen', '.topbar', '.main', '.pet-stage', '.action-panel', '.scenario-switcher'];
+          const rows = selectors.map((selector) => {
+            const el = document.querySelector(selector);
+            const r = el.getBoundingClientRect();
+            return `${selector}: ${Math.round(r.width)}x${Math.round(r.height)} pos(${Math.round(r.x)},${Math.round(r.y)})`;
+          });
+          rows.push(`overflow: scrollW=${document.body.scrollWidth} vw=${innerWidth} scrollH=${document.body.scrollHeight} vh=${innerHeight}`);
+          const pre = document.createElement('pre');
+          pre.id = 'debug';
+          pre.style.cssText = 'position:fixed;left:8px;top:8px;z-index:999;background:rgba(0,0,0,.82);color:#34d399;font-size:10px;line-height:1.25;padding:6px;border-radius:8px';
+          pre.textContent = rows.join('\n');
+          document.body.appendChild(pre);
+        }, 500);
+      }
+    </script>
+  </body>
+</html>
